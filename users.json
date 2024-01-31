@@ -1,0 +1,32 @@
+[
+  {
+    "username": "user1",
+    "password": "abc123",
+    "group" : "BB",
+    "id": "1"
+  },
+  {
+    "username": "user2",
+    "password": "password2",
+    "group" : "BB",
+    "id": "2"
+  },
+  {
+    "username": "testuser",
+    "password": "testpassword",
+    "group" : "AA",
+    "id": "3"
+  },
+  {
+    "username": "ben",
+    "password": "ohiostate",
+    "group" : "AA",
+    "id": "4"
+  },
+  {
+    "username": "mike",
+    "password": "appstate",
+    "group" : "AA",
+    "id": "5"
+  }
+]

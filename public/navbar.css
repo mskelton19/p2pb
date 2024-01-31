@@ -1,0 +1,229 @@
+/* Styles for the Navbar */
+.navbar {
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding-bottom: 0;
+}
+
+/* Styles for the Menu Container */
+.menu {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 20px;
+  max-width: 100%;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Styles for the Menu Content */
+.menu .menu-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+/* Styles for the Logo */
+.menu .logo {
+  color: #fcb60e; /* Bright and modern color */
+    font-size: 24px; /* Adjust size as needed */
+    font-weight: bold;
+    letter-spacing: 1px; /* Adding some spacing between letters */
+    font-family: 'Arial', sans-serif; /* Choose a modern, clean font */
+    padding: 5px 10px; /* Add some padding for better visual appearance */
+    border-radius: 4px; /* Optional: add rounded corners if the logo has a background */
+    transition: color 0.3s ease; /* Smooth transition for hover effects */
+
+    /* Optional: add a slight shadow for depth */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    order: 2; /* Move the logo to the right */
+}
+
+.menu .logo:hover {
+  color: #ffcc00; /* Slightly different color on hover for interactivity */
+}
+
+/* Hide the Menu List by Default */
+.menu ul {
+  list-style: none;
+  margin: 0;
+  margin-top: 0;
+  padding: 0;
+  display: none;
+  width: 100%;
+  text-align: left;
+  position: absolute;
+  top: 100%; /* Position the links below the hamburger */
+  left: 0;
+}
+
+/* Style for Each Menu Item */
+.menu ul li {
+  margin-right: 20px;
+  margin-bottom: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Style for the Last Menu Item */
+.menu ul li:first-child {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+/* Style for the Last Menu Item */
+.menu ul li:last-child {
+  margin-right: 0;
+  margin-bottom: 10px;
+  border-bottom: none;
+}
+
+/* Style for Menu Links */
+.menu ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+/* Hover Effect for Menu Links */
+.menu ul li a:hover {
+  color: #FFD700;
+}
+
+/* Styles for Hamburger Icon */
+.menu .menu-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 20px;
+  cursor: pointer;
+  position: relative;
+  order: 1; /* Move the menu icon to the left */
+}
+
+/* Styles for Hamburger Bars */
+.bar {
+  width: 30px;
+  height: 3.5px;
+  background-color: white;
+  transition: all 0.3s;
+  border-radius: 1px;
+}
+
+/* Hide the Checkbox */
+.menu-checkbox {
+  display: none;
+}
+
+/* Modify the CSS for the hamburger bars based on the checkbox state */
+.menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Show the menu when the checkbox is checked */
+.menu-checkbox:checked ~ .navbar .menu ul {
+  display: block; /* or 'flex' if you want to keep the flexbox layout */
+  position: absolute; /* adjust if needed */
+  left: 0;
+  width: 100%;
+  background-color: #333; /* or any color you prefer */
+  z-index: 3; /* ensure it's above other content */
+}
+
+/* Existing styles for desktop... */
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  .navbar {
+    /* Adjust navbar styles for mobile */
+    /* padding: 5px 10px; /* Smaller padding */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* Horizontal offset, vertical offset, blur radius, spread radius, color */
+  }
+
+  .menu .logo {
+    font-size: 20px; /* Smaller logo text */
+  }
+
+  .menu .menu-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 25px; /* Reduced width */
+    height: 15px; /* Adjust height if necessary */
+    cursor: pointer;
+    position: relative;
+    order: 1; /* Keep the menu icon to the left */
+    margin-right: auto; /* Push it further to the left */
+  }
+
+  .bar {
+    height: 3px; /* Thinner bars */
+    width: 22.5px;
+    border-radius: 1px;
+  }
+
+  .menu ul {
+    position: absolute;
+    top: 100%; /* Adjust if necessary */
+    left: 0; /* Start from the left edge of the navbar */
+    width: 100%;
+    background-color: #333;
+    z-index: 3;
+
+    /* Adjust this to align with the 'X' */
+    padding-left: 35px; /* Example value, adjust as needed */
+  }
+
+  .menu ul li {
+    margin-right: 20px;
+    margin-bottom: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .menu ul li a {
+    display: block; /* Make the link fill the entire list item for better clickability */
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+
+  .menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-checkbox:checked + .navbar .menu-icon .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Show the menu when the checkbox is checked */
+  .menu-checkbox:checked ~ .navbar .menu ul {
+    display: block; /* or 'flex' if you want to keep the flexbox layout */
+    position: absolute; /* adjust if needed */
+    left: 0;
+    width: 100%;
+    background-color: #ffffff; /* or any color you prefer */
+    z-index: 3; /* ensure it's above other content */
+  }
+
+}

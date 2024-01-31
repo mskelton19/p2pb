@@ -1,0 +1,577 @@
+/* styles.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: white;
+  color: #333;
+}
+
+.time {
+  background-color: #f7f7f7; /* Light background */
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* font-weight: bold; */
+    color: #333;
+    width: max-content;
+    /* margin: 10px auto; /* Center the date container */ */
+}
+
+.time-wagers {
+  background-color: #f7f7f7; /* Light background */
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    color: #333;
+    width: max-content;
+    margin: 10px auto; /* Center the date container */
+}
+
+
+.wager-card {
+  display: block;
+  width: 100%; /* Adjust the width as needed */
+  margin-bottom: 20px; /* Space between cards */
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+}
+
+.event-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+}
+
+.bet-types-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  /* Additional styling as needed */
+}
+
+.bet-type {
+  flex: 1; /* Distribute space evenly */
+  text-align: center; /* Center text within each section */
+  font-size: 12px;
+  /* Additional styling as needed */
+}
+
+/* Additional styling for individual bet types if needed */
+.bet-type:first-child {
+  /* Styling specific to the first bet type */
+}
+
+.bet-type:last-child {
+  /* Styling specific to the second bet type */
+}
+
+.team-card {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.odds-card {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.team-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.odds-card.selected {
+  background-color: green;
+  color: white;
+}
+
+.team-card, .odds-card {
+  flex: 1; /* Distribute space evenly among child elements */
+  text-align: center; /* Center text within the container */
+}
+
+.team-card div {
+  flex: 1; /* Each team takes equal space within the flex container */
+}
+
+/* Add this CSS to style the drawer */
+.drawer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 0;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: height 0.3s ease;
+  padding: 7.5px;
+}
+
+.drawer-nav {
+  margin-bottom: 5px;
+}
+
+/* Style the content inside the drawer */
+.drawer-content {
+  text-align: center;
+    /* padding: 1rem; */
+}
+
+/* Style the close button */
+.close-button {
+  background-color: black; /* Red background color */
+  color: #fff; /* White text color */
+  padding: 10px 20px; /* Padding for better appearance */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Add border radius for rounded corners */
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Add this CSS to style the drawer header with space between team name and odds */
+.drawer-header {
+  margin: 0; /* Remove default margin */
+  padding: 10px; /* Add padding for better appearance */
+}
+
+.drawer-team-name,
+.drawer-odds {
+  margin: 0;
+  font-weight: bold;
+}
+
+.drawer-odds::before {
+  content: '\00a0'; /* Add a non-breaking space before the odds */
+}
+
+.wagerInput {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Add this CSS to style the confirm button in the drawer */
+.drawer-content button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+
+}
+
+.drawer-content button:hover {
+  background-color: #45a049;
+}
+
+/* Add this CSS to style the input wager field in the drawer */
+.drawer-content input {
+  width: 50%;
+  padding: 12px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.drawer-content input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.close-button:hover {
+  background-color: black;
+}
+
+.drawer-event-time {
+  text-align: center;
+}
+
+/* Media query for smaller screens (e.g., mobile devices) */
+@media only screen and (max-width: 600px) {
+  .drawer-content {
+    font-size: 16px; /* Adjust the font size for smaller screens */
+    /* Add any other styles specific to smaller screens */
+  }
+  .drawer-event-time {
+    font-size: 16px;
+  }
+}
+
+/* Media query for medium-sized screens (e.g., tablets) */
+@media only screen and (min-width: 601px) and (max-width: 1024px) {
+  .drawer-content {
+    font-size: 20px; /* Adjust the font size for medium-sized screens */
+    /* Add any other styles specific to medium-sized screens */
+  }
+  .drawer-event-time {
+      font-size: 20px;
+    }
+}
+
+/* Media query for larger screens (e.g., desktops) */
+@media only screen and (min-width: 1025px) {
+  .drawer-content {
+    font-size: 22px; /* Adjust the font size for larger screens */
+    /* Add any other styles specific to larger screens */
+  }
+  .drawer-event-time {
+    font-size: 22px;
+  }
+}
+
+#wagers-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Align items to the start horizontally */
+  justify-content: flex-start; /* Align items to the start vertically */
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#wagers-list {
+  list-style: none; /* Remove default list styling */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+  width: 100%;
+}
+
+.wager-card .take-wager-button:disabled {
+    background-color: gray;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Style for the "Take Wager" button */
+.wager-card .take-wager-button {
+  display: block;
+  width: auto;
+  margin: 0 auto;
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+  background-image: linear-gradient(to top, #0056b3, #007bff);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.wager-card .take-wager-button:hover {
+  background-image: linear-gradient(to bottom, #0056b3, #007bff);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.wager-card .take-wager-button:active {
+    background-image: linear-gradient(to bottom, #0056b3, #0066cc);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(2px);
+}
+
+.wager-card .openTeam {
+  font-weight: bold;
+}
+
+.wagers-container {
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Use min-height instead of height */
+    padding: 20px; /* Add some padding to create spacing */
+    box-sizing: border-box;
+}
+
+/* Add this to your CSS to style the open-team-odds-container */
+.team-odds-container {
+  display: flex; /* Use Flexbox to place elements in a row */
+  justify-content: space-between; /* Add space between elements */
+  align-items: center; /* Vertically center align elements */
+  margin: 8px;
+}
+
+/* Add this to your CSS to style the open-team-odds-container */
+.open-team-odds-container {
+  display: flex; /* Use Flexbox to place elements in a row */
+  justify-content: space-between; /* Add space between elements */
+  align-items: center; /* Vertically center align elements */
+  margin: 8px;
+}
+
+.taken-team-card, .taken-odds-card {
+  color: #333; /* Neutral color */
+  font-size: 16px; /* Standard font size */
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0; /* Light background */
+  margin-top: 5px;
+}
+
+.open-odds-card {
+  cursor: pointer; /* Cursor changes to pointer to indicate clickability */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.open-odds-card:hover {
+  background-color: #eef4ff; /* Light blue background on hover */
+  color: #0056b3; /* Darker blue text on hover */
+}
+
+.open-odds-card.selected {
+  background-color: #28a745; /* Green background */
+  color: white; /* White text */
+}
+
+.spacing-element {
+  margin-right: 10px; /* Adjust the value as needed */
+}
+
+/* Add this to your CSS file (styles.css) */
+h4 {
+  text-align: left;
+  padding-left: 5px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+/* Add this CSS rule in your stylesheet */
+.larger {
+  font-size: 10px; /* You can adjust the font size as needed */
+}
+
+.time {
+  text-align: center;
+}
+
+.wager {
+  margin-bottom: 5px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.username {
+  display: block; /* Ensure it's a block-level element */
+  text-align: center; /* Center-align the text */
+  margin-top: 5px; /* Optional: add some space between the wager and the username */
+  font-size: 14px; /* Adjust the font size as needed */
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%; // Ensure it spans the full width of the wager card
+}
+
+/* Accepted Bets Page Styles */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  top-margin: 20px;
+}
+
+#accepted-bets-list {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bet-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  width: 90%; /* Adjust based on your layout */
+  max-width: 600px; /* Optional, for wider screens */
+  display: flex; /* Make the bet card a flex container */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center-align items horizontally */
+  margin-bottom: 20px; /* Space between cards */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.bet-card h2 {
+  color: #007bff; /* Vibrant blue for headings */
+  margin-top: 0;
+}
+
+.bet-card button {
+  background-color: #007bff; /* Vibrant blue for buttons */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.bet-card button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+.time-bets {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.time-bets, .odds-container {
+  width: 100%; /* Full width */
+  text-align: center; /* Center text */
+  margin-bottom: 10px; /* Space below the element */
+}
+
+.team-info-container {
+  display: flex; /* Use flex layout */
+  justify-content: space-between; /* Space out the children */
+  width: 100%; /* Full width of the parent container */
+  margin-top: 10px;
+}
+
+.date-time, .odds {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.info-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.team-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 15px;
+}
+
+.odds-container {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.team-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.team-card {
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  padding: 10px;
+  width: 48%; /* Adjust as needed */
+  text-align: center;
+}
+
+.team-card div {
+  margin-bottom: 5px;
+}
+
+.score {
+  font-size: larger; /* Increase font size */
+  margin-bottom: 10px; /* Add gap below the score */
+  font-weight: bold;
+}
+
+#sports-icons-container {
+  margin-top: 70px;
+  display: flex;
+  justify-content: center;
+}
+
+.sport-icon {
+  margin: 0 10px;
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.sport-icon .highlighted-icon {
+    background-color: red; /* Example background color for highlighting */
+}
+
+.finished-event-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.wager-amount {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.event-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.event-details > div {
+  flex-basis: 48%; /* Adjust the width of each column */
+}
+
+.winner, .loser {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.winner h4, .loser h4 {
+  margin-top: 0;
+}
+
+.finished-event-card h3 {
+  margin-top: 0;
+}
