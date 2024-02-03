@@ -74,6 +74,9 @@ async function fetchEvents(sportId, leagueId) {
       displayEventData(event, oddsData);
     }
 
+    window.scrollTo(0, 0); // Scrolls to the top of the page
+
+
     isFetching = false; // Reset the flag after processing data
   } catch (error) {
     console.error('Error fetching data:', error.message);

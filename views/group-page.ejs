@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="navbar.css">
+  <title>Group Page</title>
+  <!-- Add any additional CSS or meta tags you need here -->
+  <style>
+    /* Existing styles */
+    <style>
+    /* Existing styles */
+    body {
+      font-family: 'Roboto', sans-serif; /* Using Roboto font */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      border-spacing: 0;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      color: #333; /* Darker text for better contrast */
+      font-weight: normal;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9; /* Zebra striping for rows */
+    }
+
+    tbody tr:hover {
+      background-color: #f1f1f1; /* Hover effect for rows */
+    }
+
+    td {
+      border-bottom: 1px solid #ddd; /* Border for each cell */
+    }
+
+    /* Responsive design adjustments */
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px; /* Increase font size for better readability on small screens */
+      }
+      table {
+        font-size: 14px; /* Adjust table font size for small screens */
+      }
+      th, td {
+        padding: 12px; /* Increase padding for better touch interaction */
+      }
+      .navbar ul {
+        font-size: 16px; /* Adjust navbar font size */
+      }
+      /* Add more responsive styles as needed */
+    }
+  </style>
+
+  </style>
+
+</head>
+<body>
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+
+  <nav class="navbar">
+    <div class="menu">
+      <div class="menu-content">
+        <!-- Hamburger Menu Icon -->
+        <div class="menu-icon" id="menu-icon">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <!-- Logo -->
+        <div class="logo">ChalkIQ</div>
+      </div>
+      <!-- Menu Items -->
+      <ul>
+        <li><a href="/games">Games</a></li>
+        <li><a href="/wagers">Wagers</a></li>
+        <li><a href="/mybets">My Bets</a></li>
+        <li><a href="/my-stats">My Stats</a></li>
+        <li><a href="/mygroup">My Group</a></li>
+      </ul>
+    </div>
+  </nav>
+  <h1><%= userGroup %></h1>
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Wins</th>
+        <th>Losses</th>
+        <th>Win Percentage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% groupUsers.forEach(function(user) { %>
+        <tr>
+          <td><%= user.username %></td>
+          <td><%= user.wins %></td>
+          <td><%= user.losses %></td>
+          <td><%= (user.winPct * 100).toFixed(2) + '%' %></td> <!-- Adjusted for percentage display -->
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <!-- You can add more content or styling as needed -->
+<script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->
+</body>
+</html>

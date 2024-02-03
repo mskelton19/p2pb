@@ -7,15 +7,15 @@ body {
 }
 
 .time {
-  background-color: #f7f7f7; /* Light background */
+  background-color: #f0f0f0f0; /* Light background */
     padding: 5px 10px;
     margin-bottom: 10px;
     text-align: left;
-    border-radius: 15px;
+    border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* font-weight: bold; */
     color: #333;
     width: max-content;
+    border-width: medium;
     /* margin: 10px auto; /* Center the date container */ */
 }
 
@@ -42,7 +42,7 @@ body {
   margin-bottom: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #f0f0f0;
+  background-color: white;
 }
 
 .event-card {
@@ -120,11 +120,23 @@ body {
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: height 0.3s ease;
-  padding: 7.5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  /* padding: 7.5px; */
+}
+
+#drawer-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100vh; /* Take full viewport height */
 }
 
 .drawer-nav {
-  margin-bottom: 5px;
+  display: flex;
+   justify-content: flex-end; /* Align to the right */
+   padding: 10px; /* Add some padding */
+
 }
 
 /* Style the content inside the drawer */
@@ -135,13 +147,14 @@ body {
 
 /* Style the close button */
 .close-button {
-  background-color: black; /* Red background color */
-  color: #fff; /* White text color */
-  padding: 10px 20px; /* Padding for better appearance */
-  border: none; /* Remove border */
-  border-radius: 5px; /* Add border radius for rounded corners */
-  cursor: pointer;
-  font-size: 16px;
+  background-color: #333333; /* Red background color */
+   color: #fff; /* White text color */
+   padding: 10px 20px; /* Padding for better appearance */
+   border: none; /* Remove border */
+   cursor: pointer;
+   font-size: 16px;
+   margin: 0; /* Ensure no margin is applied */
+   border-radius: 5px;
 }
 
 /* Add this CSS to style the drawer header with space between team name and odds */
@@ -150,9 +163,15 @@ body {
   padding: 10px; /* Add padding for better appearance */
 }
 
+.drawer-info {
+  text-align: center;
+  margin-bottom: 10px; /* Space above the wager input */
+}
+
 .drawer-team-name,
 .drawer-odds {
-  margin: 0;
+  display: inline; /* Inline display for same line */
+  margin: 0 5px;
   font-weight: bold;
 }
 
@@ -176,6 +195,10 @@ body {
   font-size: 16px;
   transition: background-color 0.3s ease;
   margin-top: 10px;
+  display: block; /* Block display for center alignment */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px
 
 }
 
@@ -187,7 +210,8 @@ body {
 .drawer-content input {
   width: 50%;
   padding: 12px;
-  margin: 8px 0;
+  margin: 8px auto;
+  display box; 10;
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -325,11 +349,12 @@ body {
 
 .taken-team-card, .taken-odds-card {
   color: #333; /* Neutral color */
-  font-size: 16px; /* Standard font size */
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f0f0f0; /* Light background */
-  margin-top: 5px;
+   font-size: 16px; /* Standard font size */
+   padding: 10px;
+   border-radius: 5px;
+   background-color: #f0f0f0; /* Light background */
+   margin: 5px 0; /* Adjust margins as needed */
+   text-align: center; /* Ensure text is centered *
 }
 
 .open-odds-card {
@@ -368,12 +393,15 @@ h4 {
 
 .time {
   text-align: center;
+  background-color: #f0f0f0;
+  border: 10px;
 }
 
 .wager {
   margin-bottom: 5px;
   margin-top: 15px;
   text-align: center;
+  font-size: 24px;
 }
 
 .username {
@@ -393,8 +421,8 @@ h4 {
 /* Accepted Bets Page Styles */
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  font-family: 'Roboto Condensed', sans-serif;
+  background-color: #cccccc;
   color: #333;
   margin: 0;
   padding: 0;
@@ -414,6 +442,7 @@ h1 {
   flex-direction: column;
   align-items: center;
 }
+
 
 .bet-card {
   background-color: white;
@@ -516,6 +545,10 @@ h1 {
   margin-bottom: 5px;
 }
 
+.time {
+  font-weight: bold;
+}
+
 .score {
   font-size: larger; /* Increase font size */
   margin-bottom: 10px; /* Add gap below the score */
@@ -523,18 +556,32 @@ h1 {
 }
 
 #sports-icons-container {
-  margin-top: 70px;
+  top: 50px; /* Height of the navbar, adjust if different */
+  z-index: 1000;
+  background-color: #f8f9fa; /* Example background color */
+  border-bottom: 1px solid #e7e7e7;
+  padding: 5px;
+  text-align: center;
   display: flex;
   justify-content: center;
+  box-shadow: 0 4px 8px -2px rgba(0,0,0,0.2); /* Added shadow */
+  position: sticky;
+  margin-bottom: 15px;
 }
 
 .sport-icon {
-  margin: 0 10px;
+  display: inline-block;
+  margin: 2px 5px;
+  padding: 2px 5px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 5px; /* Rounded corners */
+  /* transition: background-color 0.1s; */
 }
+
+.sport-icon:hover {
+     background-color: #ddd; /* Hover effect */
+   }
 
 .sport-icon .highlighted-icon {
     background-color: red; /* Example background color for highlighting */
@@ -574,4 +621,27 @@ h1 {
 
 .finished-event-card h3 {
   margin-top: 0;
+}
+
+/* Card Container */
+#events-container .event-card {
+    background-color: #ffffff; /* White background for the card */
+    border: 1px solid #e0e0e0; /* Light grey border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 8px; /* Rounded corners */
+    margin-bottom: 20px; /* Spacing between cards */
+    overflow: hidden; /* Ensures the content fits within the rounded corners */
+}
+
+/* Card Header, if there is one */
+#events-container .event-card .card-header {
+    background-color: #f7f7f7; /* Lighter background for the header */
+    border-bottom: 1px solid #e0e0e0; /* Separation line */
+    padding: 10px; /* Padding around header content */
+    font-weight: bold; /* Make text bold */
+}
+
+/* Card Body */
+#events-container .event-card .card-body {
+    padding: 15px; /* Padding inside the card */
 }

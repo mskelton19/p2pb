@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="navbar.css">
 
-  <title>Bet365 Upcoming Events</title>
+  <title>Upcoming Events</title>
 </head>
 <body>
 
@@ -34,6 +34,7 @@
         <li><a href="/wagers">Wagers</a></li>
         <li><a href="/mybets">My Bets</a></li>
         <li><a href="/my-stats">My Stats</a></li>
+        <li><a href="/mygroup">My Group</a></li>
       </ul>
     </div>
   </nav>
@@ -46,7 +47,6 @@
     <div class="sport-icon" data-sportid="18" data-leagueid="10068518">E-BBall</div>
     <!-- Add more sports as needed -->
   </div>
-  <h4>Bet365 Upcoming Events</h4>
 
   <script>
     var userData = <%- JSON.stringify(user) %>;
@@ -55,25 +55,33 @@
     console.log('user data in games.ejs:', userData)
   </script>
 
-  <div id="events-container"></div>
+  <div id="main-container">
+    <div id="events-container"></div>
+  </div>
+
   <script src="games.js"></script>
   <script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->
 </body>
 
 <!-- Update the drawer HTML for team name and odds on the same line -->
-<div id="drawer" class="drawer">
-  <div class="drawer-nav">
-    <!-- Updated close button -->
-    <div class="close-button" onclick="hideDrawer()">x</div>
-  </div>
-  <!-- <div class="drawer-header">
-    <p id="drawerEventTime" class="drawer-event-time"></p>
-  </div> -->
-  <div class="drawer-content">
+<div id="drawer-container">
+  <div id="drawer" class="drawer">
+    <div class="drawer-nav">
+      <!-- Updated close button -->
+      <div class="close-button" onclick="hideDrawer()">x</div>
+    </div>
+    <!-- <div class="drawer-header">
+      <p id="drawerEventTime" class="drawer-event-time"></p>
+    </div> -->
+    <div class="drawer-content">
+  <div class="drawer-info">
     <p id="drawerTeamName" class="drawer-team-name"></p>
     <p id="drawerOdds" class="drawer-odds"></p>
-    <input type="text" id="wagerInput" placeholder="Enter wager">
-    <button id="confirmButton" onclick="confirmWager(teamNames, eventTime)">Place Bet</button>
+  </div>
+  <input type="text" id="wagerInput" placeholder="Enter wager">
+  <button id="confirmButton" onclick="confirmWager(teamNames, eventTime)">Place Bet</button>
+</div>
+
   </div>
 </div>
 
