@@ -2,90 +2,71 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchEvents(12, 10037219);
 
     let selectedIcon = null;
+    globalThis.requestQueue = []; // Define requestQueue in the global scope
+    globalThis.isProcessing = false; // Define isProcessing in the global scope
 
     const sportIcons = document.querySelectorAll('.sport-icon');
-    // console.log("Sport Icons Found:", sportIcons.length); // Log how many icons were found
-
     sportIcons.forEach(icon => {
         icon.addEventListener('click', function() {
-            // console.log("Icon clicked:", this); // Log the clicked icon
-
             if (selectedIcon) {
-                // console.log("Removing highlight from:", selectedIcon);
                 selectedIcon.classList.remove('highlighted-icon');
             }
 
-            // console.log("Adding highlight to:", this);
             this.classList.add('highlighted-icon');
             selectedIcon = this;
 
             const sportId = this.dataset.sportid;
             const leagueId = this.dataset.leagueid;
-            fetchEvents(sportId, leagueId);
+
+            // Add new request to the queue
+            requestQueue.push({ sportId, leagueId });
+            if (!isProcessing) {
+                processQueue();
+            }
         });
     });
 });
 
-
-// Retrieve user data from the data attribute
-var userData;
-
-let isFetching = false;
-
-async function fetchEvents(sportId, leagueId) {
-  if (isFetching) {
-    console.log("Fetch in progress. Please wait.");
-    return; // Prevent new fetch if one is already in progress
-  }
-
-  try {
-    isFetching = true;
-
-    let url = '/upcoming-events';
-    let params = new URLSearchParams();
-
-    if (sportId) {
-      params.append('sportID', sportId);
-    }
-    if (leagueId) {
-      params.append('leagueID', leagueId);
-    }
-    url += `?${params.toString()}`;
-
-    const eventsContainer = document.getElementById('events-container');
-    eventsContainer.innerHTML = ''; // Clear existing results before fetching new data
-
-    const response = await fetch(url);
-    const rawData = await response.json();
-    // console.log("URL used for fetch:", url);
-
-    // Check if rawData is an object (single event) and convert it to an array
-    const eventsData = Array.isArray(rawData) ? rawData : [rawData];
-
-    // use the event ids to get the odds for each game
-    for (const event of eventsData[0].results) {
-      // Call the server route to get event odds
-      const oddsResponse = await fetch(`/bet365-eventodds/${event.id}`);
-      const oddsData = await oddsResponse.json();
-
-      // Display the data on the webpage
-      displayEventData(event, oddsData);
+function processQueue() {
+    if (requestQueue.length === 0) {
+        isProcessing = false;
+        return;
     }
 
-    window.scrollTo(0, 0); // Scrolls to the top of the page
-
-
-    isFetching = false; // Reset the flag after processing data
-  } catch (error) {
-    console.error('Error fetching data:', error.message);
-    isFetching = false; // Reset the flag in case of an error
-  }
+    isProcessing = true;
+    const { sportId, leagueId } = requestQueue.shift(); // Get the first request from the queue
+    fetchEvents(sportId, leagueId).then(() => {
+        processQueue(); // Process the next request in the queue
+    });
 }
 
-// Continue with the rest of your code...
+var userData;
 
+async function fetchEvents(sportId, leagueId) {
+    const eventsContainer = document.getElementById('events-container');
+    eventsContainer.innerHTML = '';
 
+    try {
+        let url = '/upcoming-events';
+        let params = new URLSearchParams({ sportID: sportId, leagueID: leagueId });
+        url += `?${params.toString()}`;
 
+        const response = await fetch(url);
+        const rawData = await response.json();
+
+        const eventsData = Array.isArray(rawData) ? rawData : [rawData];
+        for (const event of eventsData[0].results) {
+            const oddsResponse = await fetch(`/bet365-eventodds/${event.id}`);
+            const oddsData = await oddsResponse.json();
+            displayEventData(event, oddsData);
+        }
+        window.scrollTo(0, 0);
+    } catch (error) {
+        console.error('Error fetching data:', error.message);
+    }
+}
+
+// Your existing functions like displayEventData, createTeamCard, etc.
 
 
 function displayEventData(event, oddsData) {

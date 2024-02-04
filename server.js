@@ -628,8 +628,10 @@ app.get('/mygroup', async (req, res) => {
       // Fetch all users in the same group along with their stats
       const groupUsers = await usersCollection.find({ group: userGroup }, { projection: { username: 1, wins: 1, losses: 1, winPct: 1 } }).toArray();
 
+      const currentUser = req.user.username;
+
       // Render the group page with the list of users
-      res.render('group-page', { groupUsers: groupUsers, userGroup: userGroup });
+      res.render('group-page', { groupUsers: groupUsers, userGroup: userGroup, currentUser: currentUser });
     } catch (error) {
       console.error('Error fetching group users:', error.message);
       res.status(500).json({ success: false, error: 'Internal Server Error' });

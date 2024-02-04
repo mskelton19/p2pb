@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="navbar.css">
+  <link href="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/js/tabulator.min.js"></script>
+
   <title>Group Page</title>
   <!-- Add any additional CSS or meta tags you need here -->
   <style>
     /* Existing styles */
-    <style>
-    /* Existing styles */
+
     body {
       font-family: 'Roboto', sans-serif; /* Using Roboto font */
     }
@@ -59,9 +62,39 @@
       .navbar ul {
         font-size: 16px; /* Adjust navbar font size */
       }
-      /* Add more responsive styles as needed */
+      body {
+        font-family: 'Roboto', sans-serif;
+      }
+      .tabulator {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.tabulator-header {
+  background-color: #4CAF50; /* Change as per your color scheme */
+  color: white;
+}
+
+.tabulator-row {
+  border-bottom: 1px solid #ddd;
+}
+
+.tabulator-row:hover {
+  background-color: #f5f5f5; /* Hover effect for rows */
+}
+
+.tabulator-cell {
+  padding: 12px 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .tabulator-cell {
+    padding: 10px;
+  }
+}
     }
-  </style>
 
   </style>
 
@@ -91,29 +124,45 @@
       </ul>
     </div>
   </nav>
-  <h1><%= userGroup %></h1>
-  <table>
-    <thead>
-      <tr>
-        <th>User</th>
-        <th>Wins</th>
-        <th>Losses</th>
-        <th>Win Percentage</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% groupUsers.forEach(function(user) { %>
-        <tr>
-          <td><%= user.username %></td>
-          <td><%= user.wins %></td>
-          <td><%= user.losses %></td>
-          <td><%= (user.winPct * 100).toFixed(2) + '%' %></td> <!-- Adjusted for percentage display -->
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
+
+  <h2 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h2>
+
+  <div id="group-table"></div>
 
   <!-- You can add more content or styling as needed -->
 <script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/js/tabulator.min.js"></script>
+<script>
+  var currentUser = "<%= currentUser %>"; // Get the current user's username from EJS variable
+</script>
+
+<script>
+  // Parse your EJS data into JavaScript
+  var data = <%- JSON.stringify(groupUsers) %>;
+
+  // Initialize Tabulator on the div with id 'group-table'
+  var table = new Tabulator("#group-table", {
+    data: data, // Assign data to table
+    columns: [
+      {title: "User", field: "username"},
+      {title: "Wins", field: "wins"},
+      {title: "Losses", field: "losses"},
+      {title: "Win %", field: "winPct", formatter: function(cell, formatterParams){
+        var value = cell.getValue();
+        return (value * 100).toFixed(2) + '%';
+      }},
+    ],
+    layout: "fitColumns", // Fit columns to width of table
+    pagination: "local", //enable local pagination.
+    paginationSize: 10, // rows per page
+    responsiveLayout: "hide", //hide columns that dont fit on the table
+    tooltips: true, //show tool tips on cells
+    addRowPos: "top", //when adding a new row, add it to the top of the table
+    history: true, //allow undo and redo actions on the table
+    movableColumns: true, //allow column order to be changed
+ });
+
+</script>
+
 </body>
 </html>
