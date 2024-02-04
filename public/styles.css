@@ -645,3 +645,27 @@ h1 {
 #events-container .event-card .card-body {
     padding: 15px; /* Padding inside the card */
 }
+
+.toast-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  opacity: 0.9;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from { bottom: 0; opacity: 0; }
+  to { bottom: 20px; opacity: 0.9; }
+}
+
+@keyframes fadeout {
+  from { bottom: 20px; opacity: 0.9; }
+  to { bottom: 0; opacity: 0; }
+}

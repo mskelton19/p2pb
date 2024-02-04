@@ -1,5 +1,3 @@
-// public/main.js
-
 document.addEventListener('DOMContentLoaded', () => {
     fetchEvents(12, 10037219);
 
@@ -290,11 +288,67 @@ function hideDrawer() {
   document.getElementById('drawerTeamName').textContent = '';
   document.getElementById('drawerOdds').textContent = '';
   document.getElementById('wagerInput').value = '';
+
+  if (selectedOddsCard) {
+    selectedOddsCard.classList.remove('selected');
+    selectedOddsCard = null; // Reset the selectedOddsCard variable
+  }
 }
 
 
+// // Add this function to handle confirming the wager
+// function confirmWager(teamNames, eventTime, username) {
+//
+//   // Pass along original pick
+//   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
+//   // Pass along taken odds
+//   const drawerOdds = document.getElementById('drawerOdds').textContent;
+//   // Pass along wager amount
+//   const wagerInput = document.getElementById('wagerInput').value.trim();
+//   // Pass along available team
+//   const otherTeamName = teamNames.homeTeamName === drawerTeamName ? teamNames.awayTeamName : teamNames.homeTeamName;
+//
+//   const gameTime = eventTime;
+//
+//   const sportId = selectedOddsCard.dataset.sportId;
+//   const eventId = selectedOddsCard.dataset.eventId;
+//
+//   // Save the wager
+//   if (wagerInput !== '') {
+//     fetch('/place-wager', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         teamName: drawerTeamName,
+//         openTeam: otherTeamName,
+//         takenOdds: parseFloat(drawerOdds),
+//         openOdds: (drawerOdds * -1),
+//         wager: parseFloat(wagerInput),
+//         eventTime: gameTime,
+//         firstUser: username,
+//         group: userGroup,
+//         sportId: sportId,
+//         eventId: eventId,
+//       }),
+//     })
+//       .then(response => response.json())
+//       .then(data => {
+//         console.log('Wager placed:', data.wager);
+//         // Handle success or show a confirmation message to the user
+//       })
+//       .catch(error => {
+//         console.error('Error placing wager:', error.message);
+//         // Handle error and show an error message to the user
+//       });
+//   } else {
+//     console.log('Please enter a wager before confirming.');
+//   }
+// }
+
 // Add this function to handle confirming the wager
-function confirmWager(teamNames, eventTime, username) {
+function confirmWager2(teamNames, eventTime, username) {
 
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
@@ -333,6 +387,8 @@ function confirmWager(teamNames, eventTime, username) {
       .then(response => response.json())
       .then(data => {
         console.log('Wager placed:', data.wager);
+        hideDrawer();
+        showToast('Wager placed successfully!');
         // Handle success or show a confirmation message to the user
       })
       .catch(error => {
@@ -341,56 +397,21 @@ function confirmWager(teamNames, eventTime, username) {
       });
   } else {
     console.log('Please enter a wager before confirming.');
+    showToast('Error placing wager. Please try again.');
   }
 }
 
-// Add this function to handle confirming the wager
-function confirmWager2(teamNames, eventTime, username) {
+function showToast(message, duration = 3000) {
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.classList.add('toast-message');
+  toast.textContent = message;
 
-  // Pass along original pick
-  const drawerTeamName = document.getElementById('drawerTeamName').textContent;
-  // Pass along taken odds
-  const drawerOdds = document.getElementById('drawerOdds').textContent;
-  // Pass along wager amount
-  const wagerInput = document.getElementById('wagerInput').value.trim();
-  // Pass along available team
-  const otherTeamName = teamNames.homeTeamName === drawerTeamName ? teamNames.awayTeamName : teamNames.homeTeamName;
+  // Append toast to the body
+  document.body.appendChild(toast);
 
-  const gameTime = eventTime;
-
-  const sportId = selectedOddsCard.dataset.sportId;
-  const eventId = selectedOddsCard.dataset.eventId;
-
-  // Save the wager
-  if (wagerInput !== '') {
-    fetch('/place-wager-2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        teamName: drawerTeamName,
-        openTeam: otherTeamName,
-        takenOdds: parseFloat(drawerOdds),
-        openOdds: (drawerOdds * -1),
-        wager: parseFloat(wagerInput),
-        eventTime: gameTime,
-        firstUser: username,
-        group: userGroup,
-        sportId: sportId,
-        eventId: eventId,
-      }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Wager placed:', data.wager);
-        // Handle success or show a confirmation message to the user
-      })
-      .catch(error => {
-        console.error('Error placing wager:', error.message);
-        // Handle error and show an error message to the user
-      });
-  } else {
-    console.log('Please enter a wager before confirming.');
-  }
+  // Remove toast after 'duration' milliseconds
+  setTimeout(() => {
+    toast.remove();
+  }, duration);
 }

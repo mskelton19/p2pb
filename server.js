@@ -3,23 +3,18 @@ const session = require('express-session');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
-// const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const ejs = require('ejs'); // Require EJS
+const ejs = require('ejs');
 const {v4: uuidv4} = require('uuid');
-const { MongoClient } = require('mongodb');
 require('dotenv').config();
-const mongoUri = process.env.MONGO_URI; // Make sure to add MONGO_URI in your .env file
 const bcrypt = require('bcrypt');
-const { ObjectId } = require('mongodb');
+const mongoUri = process.env.MONGO_URI;
+const { MongoClient, ObjectId } = require('mongodb');
+const mongoClient = new MongoClient(mongoUri);
 
-
-
-// Creating a database
-const mongoClient = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
+// MongoDB connection
 async function connectToMongoDB() {
   try {
     await mongoClient.connect();
@@ -31,12 +26,12 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-// Telling the code what collections are available
+// Available collections in the database
 const db = mongoClient.db("Bets");
 const wagersCollection = db.collection("openWagers");
 const acceptedBetsCollection = db.collection("acceptedBets");
-const finishedBetsCollection = db.collection("finishedBets"); // Your collection name for finished bets
-const usersCollection = db.collection("users"); // Make sure this line is after you've defined `db`
+const finishedBetsCollection = db.collection("finishedBets");
+const usersCollection = db.collection("users");
 
 // Shutting down the database when the server goes down
 process.on('SIGINT', async () => {
@@ -46,8 +41,7 @@ process.on('SIGINT', async () => {
 
 let savedEventData = [];
 
-// const {showDrawer} = require('/public')
-
+// Express server
 const app = express();
 const port = 3000;
 
@@ -61,8 +55,7 @@ const bet365ApiOptions = {
   },
 };
 
-const usersFile = 'users.json';
-
+// Login functionality
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -125,7 +118,6 @@ passport.use(new LocalStrategy(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 3. User Identification
 // After successful authentication, store user information in the session
 passport.serializeUser((user, done) => {
   done(null, user._id); // Serialize user by _id
@@ -141,43 +133,6 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-
-function getUsersDataFromJson() {
-  // Read user data from 'users.json' and return as an array
-  try {
-    const userData = fs.readFileSync(usersFile, 'utf8');
-    const users = JSON.parse(userData);
-    return users;
-  } catch (error) {
-    console.error('Error reading users data from file:', error);
-    return [];
-  }
-}
-
-// Handle user login
-// app.post('/login', (req, res) => {
-//   const { username, password } = req.body;
-//
-//   // Read user data from 'users.json' and return as an array
-//   const usersData = getUsersDataFromJson(); // Replace with your logic
-//   const user = usersData.find(u => u.username === username && u.password === password);
-//
-//   if (user) {
-//     // Simulate a successful login
-//     req.login(user, (err) => {
-//       if (err) {
-//         console.error('Error during login:', err);
-//         return res.redirect('/login');
-//       }
-//       console.log('successful login')
-//       return res.redirect('/games');
-//     });
-//   } else {
-//     // Simulate a failed login
-//     res.redirect('/login');
-//   }
-// });
-
 app.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
   const user = await usersCollection.findOne({ username });
@@ -192,19 +147,7 @@ app.post('/login', async (req, res, next) => {
   }
 });
 
-
-
-
-// Route to serve the HTML file
-// app.get('/games', (req, res) => {
-//   if (req.session.passport && req.session.passport.user) {
-//     const user = req.session.passport.user;
-//     res.render('games', { user: user });
-//   } else {
-//     res.redirect('/login');
-//   }
-// });
-
+// Render games.ejs page
 app.get('/games', (req, res) => {
   if (req.isAuthenticated()) {
     console.log(req.user);
@@ -214,7 +157,7 @@ app.get('/games', (req, res) => {
   }
 });
 
-
+// Get upcoming events from Bet365
 app.get('/upcoming-events', async (req, res) => {
   const sportID = req.query.sportID;
   const leagueID = req.query.leagueID;
@@ -251,7 +194,7 @@ app.get('/upcoming-events', async (req, res) => {
 });
 
 
-
+// Get specific odds for upcoming events
 app.get('/bet365-eventodds/:eventId', async (req, res) => {
 
   const eventId = req.params.eventId;
@@ -264,13 +207,9 @@ app.get('/bet365-eventodds/:eventId', async (req, res) => {
       },
     });
 
-    // console.log('Bet365 API Response:', response.data.results[0].main.sp.game_lines.odds[0].handicap);
-
     if (!response.data.success) {
       throw new Error(`Error: ${response.data.error}`);
     }
-
-    // console.log('response data ' + response.data.results[0].main.sp.game_lines.odds[0])
 
     const oddsData = response.data.results[0].main.sp.game_lines.odds[0];
     res.json(oddsData);
@@ -283,35 +222,8 @@ app.get('/bet365-eventodds/:eventId', async (req, res) => {
 // Declare wagers as a global array
 const wagers = [];
 
-// Route to handle wagers
-app.post('/place-wager', express.json(), (req, res) => {
-  const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, eventId } = req.body;
-
-  // console.log('odds: ' + odds)
-
-  // Save the wager to the in-memory database
-  const newWager = {
-    teamName,
-    openTeam,
-    takenOdds,
-    openOdds,
-    wager,
-    eventTime,
-    firstUser,
-    group,
-    sportId,
-    eventId,
-  };
-
-  wagers.push(newWager);
-
-  res.json({
-    success: true,
-    wager: newWager,
-  });
-});
-
-app.post('/place-wager-2', express.json(), async (req, res) => {
+// Placing a wager
+app.post('/place-wager', express.json(), async (req, res) => {
   const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, eventId } = req.body;
 
   const newWager = {
@@ -367,16 +279,6 @@ app.get('/get-wagers', async (req, res) => {
   }
 });
 
-// // Serve the wagers.html page
-// app.get('/wagers', (req, res) => {
-//   if (req.session.passport && req.session.passport.user) {
-//     const user = req.session.passport.user;
-//     res.render('wagers', { user: user }); // Use 'user' instead of 'req.session.user'
-//   } else {
-//     res.redirect('/login');
-//   }
-// });
-
 app.get('/wagers', (req, res) => {
   if (req.isAuthenticated()) {
     res.render('wagers', { user: req.user });
@@ -385,8 +287,7 @@ app.get('/wagers', (req, res) => {
   }
 });
 
-
-// remove wager on the db
+// remove wager when it becomes an accepted bet
 app.post('/remove-wager', express.json(), async (req, res) => {
   const { teamName, openTeam, odds, wagerAmount, eventTime, firstUser } = req.body;
 
@@ -482,26 +383,6 @@ app.get('/accepted-bets', async (req, res) => {
   }
 });
 
-// db get route
-// app.get('/mybets', async (req, res) => {
-//   if (req.session.passport && req.session.passport.user) {
-//     const username = req.session.passport.user.username;
-//
-//     try {
-//       const userBets = await acceptedBetsCollection.find({
-//         $or: [{ firstUser: username }, { betTaker: username }]
-//       }).toArray();
-//
-//       res.render('accepted-bets', { user: req.session.passport.user, acceptedBets: userBets });
-//     } catch (error) {
-//       console.error('Error fetching bets:', error.message);
-//       res.status(500).json({ success: false, error: 'Internal Server Error' });
-//     }
-//   } else {
-//     res.redirect('/login');
-//   }
-// });
-
 app.get('/mybets', async (req, res) => {
   // Check if the user is authenticated
   if (req.isAuthenticated()) {
@@ -581,7 +462,7 @@ app.get('/bet365-results/:eventId', async (req, res) => {
   }
 });
 
-app.post('/save-finished-event-2', async (req, res) => {
+app.post('/save-finished-event', async (req, res) => {
     const eventData = req.body;
     const { originalTeamScore, acceptedTeamScore, originalOdds, acceptedOdds, originalUser, secondUser, wagerAmount, acceptedPick, originalPick, eventTime } = eventData;
 
@@ -704,23 +585,6 @@ app.get('/finished-bets', async (req, res) => {
   }
 });
 
-
-// db route for my stats
-// app.get('/my-stats', async (req, res) => {
-//   if (req.isAuthenticated()) {
-//     try {
-//       const username = req.user.username; // Adjust according to your user object
-//       const myStatsData = await finishedBetsCollection.find({ $or: [{ originalUser: username }, { secondUser: username }] }).toArray();
-//       res.render('my-stats', { user: req.user, myStats: myStatsData });
-//     } catch (error) {
-//       console.error('Error fetching my stats:', error.message);
-//       res.status(500).json({ success: false, error: 'Internal Server Error' });
-//     }
-//   } else {
-//     res.redirect('/login');
-//   }
-// });
-
 app.get('/my-stats', async (req, res) => {
   if (req.isAuthenticated()) {
     const username = req.user.username;
@@ -774,9 +638,6 @@ app.get('/mygroup', async (req, res) => {
     res.redirect('/login');
   }
 });
-
-
-
 
 // Start the server
 app.listen(port, () => {

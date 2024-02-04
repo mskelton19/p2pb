@@ -1,94 +1,3 @@
-// document.addEventListener('DOMContentLoaded', () => {
-//   fetchAcceptedBets();
-//   setupTabs();
-// });
-//
-// var userData;
-// const currentUser = userData.username;
-// const userGroup = userData.group;
-// //
-// async function fetchAcceptedBets() {
-//   try {
-//     const response = await fetch('/accepted-bets'); // Route to get accepted bets data
-//     const data = await response.json();
-//     // console.log(data.acceptedBets)
-//     displayAcceptedBets(data.acceptedBets);
-//   } catch (error) {
-//     console.error('Error fetching accepted bets:', error.message);
-//   }
-// }
-//
-// function setupTabs() {
-//   const upcomingTab = document.getElementById('tab-upcoming');
-//   const inProgressTab = document.getElementById('tab-inprogress');
-//   const finishedTab = document.getElementById('tab-finished');
-//   const upcomingSection = document.getElementById('upcoming-events-section');
-//   const inProgressSection = document.getElementById('in-progress-events-section');
-//   const finishedSection = document.getElementById('finished-events-section');
-//
-//   // Set 'In Progress' as the default tab
-//   upcomingSection.style.display = 'none';
-//   inProgressSection.style.display = '';
-//   finishedSection.style.display = 'none';
-//
-//   upcomingTab.addEventListener('click', () => {
-//     upcomingSection.style.display = '';
-//     inProgressSection.style.display = 'none';
-//     finishedSection.style.display = 'none';
-//   });
-//
-//   inProgressTab.addEventListener('click', () => {
-//     upcomingSection.style.display = 'none';
-//     inProgressSection.style.display = '';
-//     finishedSection.style.display = 'none';
-//   });
-//
-//   finishedTab.addEventListener('click', () => {
-//     finishedSection.style.display = '';
-//     inProgressSection.style.display = 'none';
-//     upcomingSection.style.display = 'none';
-//   });
-// }
-//
-// async function displayAcceptedBets(acceptedBets) {
-//   const upcomingEventsContainer = document.getElementById('upcoming-events');
-//   const inProgressEventsContainer = document.getElementById('in-progress-events');
-//   const finishedEventsContainer = document.getElementById('finished-events');
-//
-//   // Clear existing content
-//   upcomingEventsContainer.innerHTML = '';
-//   inProgressEventsContainer.innerHTML = '';
-//   finishedEventsContainer.innerHTML = '';
-//
-//   for (const bet of acceptedBets) {
-//     if(bet.firstUser === currentUser || bet.betTaker === currentUser) {
-//     const betCard = createBetCard(bet);
-//     const eventDateTime = new Date(bet.gameTime);
-//     const now = new Date();
-//
-//     if (eventDateTime > now) {
-//       // Event is upcoming
-//       upcomingEventsContainer.appendChild(betCard);
-//     } else {
-//       // Check if the event has finished
-//       const results = await fetchBet365Results(bet.eventId);
-//       console.log('trying to get result data')
-//       if (results && isEventFinished(results)) {
-//         // Event is finished, update final scores
-//         const sportId = results.results[0].sport_id;
-//         const finalScores = updateFinalScores(betCard, results, bet, sportId);
-//         finishedEventsContainer.appendChild(betCard);
-//         moveEventToFinished2(bet.eventId, bet, finalScores);
-//       } else {
-//         const liveData = await fetchBet365Data(bet.eventId);
-//         updateLiveScores(betCard, liveData, bet); // Update the card with scores
-//         inProgressEventsContainer.appendChild(betCard);
-//       }
-//     }
-//   }
-// }
-// }
-
 document.addEventListener('DOMContentLoaded', () => {
   fetchAcceptedBets();
   setupTabs();
@@ -154,7 +63,7 @@ function setupTabs() {
 async function fetchFinishedBets() {
   console.log('in fetchFinishedBets')
   try {
-    const response = await fetch('/finished-bets'); // Adjust the endpoint as needed
+    const response = await fetch('/finished-bets');
     if (response.ok) {
       const data = await response.json();
       return data.finishedBets; // Ensure the server response format matches
@@ -166,7 +75,6 @@ async function fetchFinishedBets() {
     throw error; // Re-throw the error to be caught by the caller
   }
 }
-
 
 function displayFinishedBets(finishedBets) {
   const finishedEventsContainer = document.getElementById('finished-events');
@@ -436,12 +344,6 @@ function updateFinalScores(betCard, resultsData, bet, sportId) {
           acceptedPickScore = bet.acceptedPick === finalScores.away.name ? scoreData12.away : scoreData12.home;
           break;
 
-
-      // Add cases for other sports with different structures
-      // case <otherSportId>:
-      //   // Logic for other sports
-      //   break;
-
       default:
         // Default case if sportId doesn't match any specific case
         console.error('Unsupported sportId:', sportId);
@@ -486,7 +388,7 @@ async function moveEventToFinished2(eventId, bet, scores) {
     };
 
     try {
-        const response = await fetch('/save-finished-event-2', {
+        const response = await fetch('/save-finished-event', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(eventData)
