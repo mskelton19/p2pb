@@ -30,15 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
 function processQueue() {
     if (requestQueue.length === 0) {
         isProcessing = false;
+        document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen
         return;
     }
+
+    // Show the loading screen
+    document.getElementById('loadingScreen').style.display = 'block';
 
     isProcessing = true;
     const { sportId, leagueId } = requestQueue.shift(); // Get the first request from the queue
     fetchEvents(sportId, leagueId).then(() => {
+        if (requestQueue.length === 0) {
+            document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen if queue is empty
+        }
         processQueue(); // Process the next request in the queue
     });
 }
+
 
 var userData;
 
@@ -227,6 +235,9 @@ function getUserTimeZoneDateTime(timestamp) {
 
 function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime) {
   const drawer = document.getElementById('drawer');
+
+  const formattedOdds = odds > 0 ? `+${odds}` : odds;
+  console.log(formattedOdds);
 
   // document.getElementById('drawerTeamNames').textContent = `${awayTeamName} vs ${homeTeamName}`;
   document.getElementById('drawerTeamName').textContent = `${pick}`;

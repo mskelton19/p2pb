@@ -1,3 +1,32 @@
+// group.js
+
+// Initialize Tabulator on the div with id 'group-table'
+// Assuming groupUsersData is defined globally in your EJS file
+var table = new Tabulator("#group-table", {
+  data: groupUsersData, // Use the passed data from group-page.ejs
+  columns: [
+    { title: "User", field: "username" },
+    { title: "Wins", field: "wins" },
+    { title: "Losses", field: "losses" },
+    {
+      title: "Win %",
+      field: "winPct",
+      formatter: function(cell, formatterParams) {
+        var value = cell.getValue();
+        return (value * 100).toFixed(2) + '%';
+      }
+    }
+  ],
+  layout: "fitColumns", // Fit columns to width of table
+  pagination: "local", // Enable local pagination
+  paginationSize: 10, // Rows per page
+  responsiveLayout: "hide", // Hide columns that don't fit on the table
+  tooltips: true, // Show tooltips on cells
+  addRowPos: "top", // When adding a new row, add it to the top of the table
+  history: true, // Allow undo and redo actions on the table
+  movableColumns: true, // Allow column order to be changed
+});
+
 // wagers.js
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -5,16 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 var userData;
-const currentUser = userData.username;
-const userGroup = userData.group;
 
-console.log(userData)
+console.log('userData', userData)
 
 async function fetchWagers() {
   try {
     const response = await fetch('/get-wagers');
     const wagersData = await response.json();
-    console.log('wagers', wagersData.wagers)
+
+    console.log(wagersData.wagers)
+
     displayWagers(wagersData.wagers);
   } catch (error) {
     console.error('Error fetching wagers:', error.message);
@@ -56,15 +85,24 @@ function createWagerCard(wager) {
     wagerCard.appendChild(dateTimeHeader);
 
     // Create a container for the wager
-    const wagerContainer = document.createElement('div');
-    wagerContainer.classList.add('wager-container');
+    // Create a container for the wager and user
+   const wagerUserContainer = document.createElement('div');
+   wagerUserContainer.classList.add('wager-user-container'); // Add a class for styling
 
    const wagerElement = document.createElement('div');
-   wagerElement.textContent = `${wager.wager}`; // Display the wager amount
-   wagerElement.classList.add('wager', 'bold', 'larger'); // Add the 'bold' class for bold font
-   wagerContainer.appendChild(wagerElement);
-   wagerCard.appendChild(wagerContainer);
+   wagerElement.textContent = `$${wager.wager}`;
+   wagerElement.classList.add('wager', 'bold'); // Reuse existing classes
 
+   const usernameElement = document.createElement('div');
+   usernameElement.textContent = wager.firstUser;
+   usernameElement.classList.add('username'); // Reuse existing classes
+
+   // Append wager amount and username to the container
+   wagerUserContainer.appendChild(wagerElement);
+   wagerUserContainer.appendChild(usernameElement);
+
+   // Append the container to the wager card
+   wagerCard.appendChild(wagerUserContainer);
 
     // Create a container for the first team
     const takenTeamContainer = document.createElement('div');
@@ -90,6 +128,7 @@ function createWagerCard(wager) {
 
     // Create open team card
     const openTeamCard = createTeamCard(wager.openTeam);
+    takenTeamCard.classList.add('open-team-card');
     openTeamContainer.appendChild(openTeamCard);
 
     // Create odds card for away team
@@ -112,11 +151,6 @@ function createWagerCard(wager) {
 
     wagerCard.appendChild(buttonContainer);
 
-    const usernameElement = document.createElement('div');
-    usernameElement.textContent = `${wager.firstUser}`; // Display the username
-    usernameElement.classList.add('username'); // Add a class for styling
-    wagerContainer.appendChild(usernameElement);
-
     return wagerCard;
   };
 
@@ -134,14 +168,23 @@ function createTeamCard(teamName) {
 
 function createOddsCard(odds, eventCard, eventTime) {
   const oddsCard = document.createElement('div');
-  oddsCard.classList.add('odds-card'); // Ensure this class is defined in your CSS
+  oddsCard.classList.add('odds-card');
 
   const oddsElement = document.createElement('div');
-  oddsElement.textContent = odds.toString(); // Set the odds text
+
+  // Check if odds are valid and format them accordingly
+  if (odds !== null && odds !== undefined) {
+    const formattedOdds = odds > 0 ? `+${odds}` : odds.toString();
+    oddsElement.textContent = formattedOdds;
+  } else {
+    oddsElement.textContent = "N/A"; // Display "N/A" if odds are invalid
+  }
+
   oddsCard.appendChild(oddsElement);
 
-  return oddsCard; // Return the created DOM node
+  return oddsCard;
 }
+
 
 function createDateTimeHeader(timestamp) {
   const header = document.createElement('div');

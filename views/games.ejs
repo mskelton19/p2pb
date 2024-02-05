@@ -14,6 +14,11 @@
 </head>
 <body>
 
+  <div id="loadingScreen" style="display: none;">
+        Loading, please wait...
+        <!-- You can add an animated spinner or other graphics here -->
+    </div>
+
   <input type="checkbox" id="menu-toggle" class="menu-checkbox">
 
   <nav class="navbar">
@@ -30,8 +35,6 @@
       </div>
       <!-- Menu Items -->
       <ul>
-        <li><a href="/games">Games</a></li>
-        <li><a href="/wagers">Wagers</a></li>
         <li><a href="/mybets">My Bets</a></li>
         <li><a href="/my-stats">My Stats</a></li>
         <li><a href="/mygroup">My Group</a></li>
@@ -40,7 +43,6 @@
   </nav>
   <!-- Sport icons container -->
   <div id="sports-icons-container">
-    <div class="sport-icon" id="wagers-icon">📈 Wagers</div>
     <div class="sport-icon" data-sportid="18" data-leagueid="10042997">🏀 NCAAB</div>
     <div class="sport-icon" data-sportid="17" data-leagueid="10037477"> 🏒 NHL</div>
     <div class="sport-icon" data-sportid="12" data-leagueid="10037219">🏈 NFL</div>

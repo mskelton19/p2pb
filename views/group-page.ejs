@@ -5,98 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="group.css"> <!-- Link to your new custom CSS file -->
   <link href="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/js/tabulator.min.js"></script>
 
   <title>Group Page</title>
   <!-- Add any additional CSS or meta tags you need here -->
-  <style>
-    /* Existing styles */
-
-    body {
-      font-family: 'Roboto', sans-serif; /* Using Roboto font */
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      border-spacing: 0;
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      color: #333; /* Darker text for better contrast */
-      font-weight: normal;
-    }
-
-    tbody tr:nth-child(even) {
-      background-color: #f9f9f9; /* Zebra striping for rows */
-    }
-
-    tbody tr:hover {
-      background-color: #f1f1f1; /* Hover effect for rows */
-    }
-
-    td {
-      border-bottom: 1px solid #ddd; /* Border for each cell */
-    }
-
-    /* Responsive design adjustments */
-    @media (max-width: 600px) {
-      body {
-        font-size: 16px; /* Increase font size for better readability on small screens */
-      }
-      table {
-        font-size: 14px; /* Adjust table font size for small screens */
-      }
-      th, td {
-        padding: 12px; /* Increase padding for better touch interaction */
-      }
-      .navbar ul {
-        font-size: 16px; /* Adjust navbar font size */
-      }
-      body {
-        font-family: 'Roboto', sans-serif;
-      }
-      .tabulator {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.tabulator-header {
-  background-color: #4CAF50; /* Change as per your color scheme */
-  color: white;
-}
-
-.tabulator-row {
-  border-bottom: 1px solid #ddd;
-}
-
-.tabulator-row:hover {
-  background-color: #f5f5f5; /* Hover effect for rows */
-}
-
-.tabulator-cell {
-  padding: 12px 15px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .tabulator-cell {
-    padding: 10px;
-  }
-}
-    }
-
-  </style>
 
 </head>
 <body>
@@ -116,8 +31,6 @@
       </div>
       <!-- Menu Items -->
       <ul>
-        <li><a href="/games">Games</a></li>
-        <li><a href="/wagers">Wagers</a></li>
         <li><a href="/mybets">My Bets</a></li>
         <li><a href="/my-stats">My Stats</a></li>
         <li><a href="/mygroup">My Group</a></li>
@@ -125,44 +38,27 @@
     </div>
   </nav>
 
-  <h2 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h2>
+  <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h3>
 
   <div id="group-table"></div>
+
+  <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Open Bets</h3>
+  <div id="wagers-container" class="wagers-container">
+    <!-- Wager cards will be dynamically added here -->
+  </div>
 
   <!-- You can add more content or styling as needed -->
 <script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/tabulator-tables/dist/js/tabulator.min.js"></script>
+<!-- Inside group-page.ejs, at the bottom, just before closing the body tag -->
 <script>
-  var currentUser = "<%= currentUser %>"; // Get the current user's username from EJS variable
+  var currentUser = "<%= currentUser %>";
+  var userGroup = "<%= userGroup %>";
+  var groupUsersData = <%- JSON.stringify(groupUsers) %>; // Pass the EJS data to a JavaScript variable
 </script>
+<script src="group.js"></script> <!-- Link to your custom JS file -->
 
-<script>
-  // Parse your EJS data into JavaScript
-  var data = <%- JSON.stringify(groupUsers) %>;
-
-  // Initialize Tabulator on the div with id 'group-table'
-  var table = new Tabulator("#group-table", {
-    data: data, // Assign data to table
-    columns: [
-      {title: "User", field: "username"},
-      {title: "Wins", field: "wins"},
-      {title: "Losses", field: "losses"},
-      {title: "Win %", field: "winPct", formatter: function(cell, formatterParams){
-        var value = cell.getValue();
-        return (value * 100).toFixed(2) + '%';
-      }},
-    ],
-    layout: "fitColumns", // Fit columns to width of table
-    pagination: "local", //enable local pagination.
-    paginationSize: 10, // rows per page
-    responsiveLayout: "hide", //hide columns that dont fit on the table
-    tooltips: true, //show tool tips on cells
-    addRowPos: "top", //when adding a new row, add it to the top of the table
-    history: true, //allow undo and redo actions on the table
-    movableColumns: true, //allow column order to be changed
- });
-
-</script>
+<a href="/games" class="floating-button">+</a>
 
 </body>
 </html>

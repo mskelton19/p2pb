@@ -138,14 +138,27 @@ app.post('/login', async (req, res, next) => {
   const user = await usersCollection.findOne({ username });
 
   if (user && bcrypt.compareSync(password, user.password)) {
-    req.login(user, (err) => {
+    req.login(user, async (err) => { // Mark this callback as async
       if (err) { return next(err); }
-      return res.redirect('/games'); // Redirect upon successful login
+
+      try {
+        // Fetch group users and related data
+        const userGroup = user.group;
+        const groupUsers = await usersCollection.find({ group: userGroup }, { projection: { username: 1, wins: 1, losses: 1, winPct: 1 } }).toArray();
+
+        // Render the group page with necessary data
+        return res.render('group-page', { groupUsers: groupUsers, userGroup: userGroup, currentUser: username });
+      } catch (error) {
+        console.error('Error fetching group users:', error.message);
+        return res.status(500).json({ success: false, error: 'Internal Server Error' });
+      }
     });
   } else {
     res.redirect('/login'); // Redirect back to login on failure
   }
 });
+
+
 
 // Render games.ejs page
 app.get('/games', (req, res) => {
