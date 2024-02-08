@@ -339,6 +339,7 @@ body {
   justify-content: space-between; /* Add space between elements */
   align-items: center; /* Vertically center align elements */
   margin: 5px;
+  background-color: white;
 }
 
 .taken-team-card, .taken-odds-card {
@@ -346,7 +347,7 @@ body {
    font-size: 0.9em; /* Standard font size */
    padding: 10px;
    border-radius: 5px;
-   background-color: #f0f0f0; /* Light background */
+   background-color: #f7f7f7; /* Light background */
    margin: 5px 0; /* Adjust margins as needed */
    text-align: center; /* Ensure text is centered *
 }
@@ -529,13 +530,14 @@ h1 {
 
 }
 
-.team-card {
+.taken-team-card {
   background-color: #f7f7f7;
   border-radius: 5px;
   padding: 10px;
   width: 48%; /* Adjust as needed */
   text-align: center;
 }
+
 
 .team-card div {
   margin-bottom: 5px;
@@ -692,6 +694,7 @@ h1 {
     text-decoration: none; /* Remove underline from the link */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for the button */
     transition: background-color 0.3s ease; /* Transition effect */
+    z-index: 1052; /* Ensure button is above navbar */
 }
 
 .floating-button:hover {

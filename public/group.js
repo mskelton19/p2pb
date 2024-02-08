@@ -1,9 +1,5 @@
-// group.js
-
-// Initialize Tabulator on the div with id 'group-table'
-// Assuming groupUsersData is defined globally in your EJS file
 var table = new Tabulator("#group-table", {
-  data: groupUsersData, // Use the passed data from group-page.ejs
+  data: groupUsersData,
   columns: [
     { title: "User", field: "username" },
     { title: "Wins", field: "wins" },
@@ -13,19 +9,33 @@ var table = new Tabulator("#group-table", {
       field: "winPct",
       formatter: function(cell, formatterParams) {
         var value = cell.getValue();
+        if (value === undefined || value === null || isNaN(value)) {
+          return "0%";
+        }
         return (value * 100).toFixed(2) + '%';
-      }
+      },
+      sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+      sorterParams: {
+        format: { // Provide formatting options
+          decimal: ".", // Use dot as decimal separator
+          thousand: "", // Don't use thousand separator
+        },
+      },
     }
   ],
-  layout: "fitColumns", // Fit columns to width of table
-  pagination: "local", // Enable local pagination
-  paginationSize: 10, // Rows per page
-  responsiveLayout: "hide", // Hide columns that don't fit on the table
-  tooltips: true, // Show tooltips on cells
-  addRowPos: "top", // When adding a new row, add it to the top of the table
-  history: true, // Allow undo and redo actions on the table
-  movableColumns: true, // Allow column order to be changed
+  layout: "fitColumns",
+  pagination: "local",
+  paginationSize: 10,
+  responsiveLayout: "hide",
+  tooltips: true,
+  addRowPos: "top",
+  history: true,
+  movableColumns: true,
+  initialSort: [ // Specify initial sorting by "Win %" column in descending order
+    { column: "winPct", dir: "desc" },
+  ],
 });
+
 
 // wagers.js
 
@@ -35,14 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 var userData;
 
-console.log('userData', userData)
-
 async function fetchWagers() {
   try {
     const response = await fetch('/get-wagers');
     const wagersData = await response.json();
-
-    console.log(wagersData.wagers)
 
     displayWagers(wagersData.wagers);
   } catch (error) {
@@ -50,33 +56,28 @@ async function fetchWagers() {
   }
 }
 
+
 function displayWagers(wagers) {
-
   const wagersContainer = document.getElementById('wagers-container');
-  wagersContainer.classList.add('wagers-container');
-  if (!wagersContainer) {
-       console.error('Wagers container element not found');
-       return;
-   }
-
   wagersContainer.innerHTML = ''; // Clear existing content
 
+  // Create and append wager cards for each wager
   const now = new Date();
-
   wagers.filter(wager => {
-     const eventDateTime = new Date(wager.eventTime); // Convert eventTime to Date object
-     return eventDateTime > now && wager.group === userGroup; // Check if event time is in the future and belongs to the user group
-   }).forEach(wager => {
-     const wagerCard = createWagerCard(wager);
-     wagersContainer.appendChild(wagerCard);
-  })
-};
+    const eventDateTime = new Date(wager.eventTime);
+    return eventDateTime > now && wager.group === userGroup;
+  }).forEach(wager => {
+    const wagerCard = createWagerCard(wager);
+    wagersContainer.appendChild(wagerCard);
+  });
+}
 
 function createWagerCard(wager) {
 
     // Create a card for each wager
     const wagerCard = document.createElement('div');
     wagerCard.classList.add('wager-card'); // Use the same class as event-card for similar styling
+    wagerCard.id = `wager-card-${wager._id}`; // Assign ID here
 
     // Create and append the date and time header
     const dateTimeHeader = document.createElement('div');
@@ -142,14 +143,21 @@ function createWagerCard(wager) {
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container'); // New class for styling
 
-    // Add a button for taking the other side of the wager
-    const takeWagerButton = document.createElement('button');
-    takeWagerButton.textContent = 'Take Wager';
-    takeWagerButton.classList.add('take-wager-button'); // Add the class to the button
-    takeWagerButton.addEventListener('click', () => handleTakeWager2(wager, currentUser, userGroup));
-    buttonContainer.appendChild(takeWagerButton);
+    const wagerActionButton = document.createElement('button');
+      wagerActionButton.classList.add('wager-action-button');
 
-    wagerCard.appendChild(buttonContainer);
+      if (wager.firstUser === currentUser) {
+          // If the current user is the one who placed the wager
+          wagerActionButton.textContent = 'Delete Bet';
+          wagerActionButton.addEventListener('click', () => deleteWager(wager));
+      } else {
+          // If the current user is not the one who placed the wager
+          wagerActionButton.textContent = 'Take Bet';
+          wagerActionButton.addEventListener('click', () => handleTakeWager2(wager, currentUser, userGroup));
+      }
+
+      buttonContainer.appendChild(wagerActionButton);
+      wagerCard.appendChild(buttonContainer);
 
     return wagerCard;
   };
@@ -196,70 +204,65 @@ function createDateTimeHeader(timestamp) {
   return header; // Return the created DOM node
 }
 
-//
-// const wagers = [];
-//
-function handleTakeWager(wager, currentUser, userGroup ) {
+document.addEventListener('DOMContentLoaded', () => {
+  fetchSportsStats();
+  fetchUserRecords();
+  // Other initialization code
+});
 
-  console.log('wagers: ' + wager);
-  // Check if the firstUser is the same as the currentUser
-  if (wager.firstUser === currentUser) {
-    console.error("Can't bet yourself");
-    // You can optionally show an error message to the user here
-    return; // Exit the function without posting the wager
+async function fetchSportsStats() {
+  try {
+    const response = await fetch('/sports-stats');
+    if (response.ok) {
+      const sportsStats = await response.json();
+      populateSportsStatsTable(sportsStats);
+    } else {
+      console.error('Failed to fetch sports stats:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error fetching sports stats:', error);
   }
-
-  // Make an HTTP request to save the wager
-  fetch('/accepted-bet', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      originalPick: wager.teamName,
-      acceptedPick: wager.openTeam,
-      originalOdds: wager.takenOdds,
-      acceptedOdds: wager.openOdds,
-      wagerAmount: wager.wager,
-      gameTime: wager.eventTime,
-      firstUser: wager.firstUser,
-      betTaker: currentUser,
-      sportId: wager.sportId,
-      eventId: wager.eventId,
-      userGroup: userGroup,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('Bet accepted:', data.bets);
-      // Send a request to remove the accepted wager from the server
-      fetch('/remove-wager', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(wager), // Send the wager data to identify which wager to remove
-      })
-        .then((response) => response.json())
-        .then((removeData) => {
-          if (removeData.success) {
-            // Refresh the displayed wagers
-            fetchWagers();
-          } else {
-            console.error('Error removing wager:', removeData.message);
-            // Handle error and show an error message to the user
-          }
-        });
-    })
-    .catch((error) => {
-      console.error('Error placing wager:', error.message);
-      // Handle error and show an error message to the user
-    });
 }
+
+function populateSportsStatsTable(sportsStats) {
+  new Tabulator("#sports-stats-table", {
+    data: sportsStats,
+    columns: [
+      { title: "Sport", field: "leagueName" },
+      { title: "Wins", field: "wins" },
+      { title: "Losses", field: "losses" },
+      {
+        title: "Win %",
+        field: "winPct",
+        formatter: "progress",
+        formatterParams: {
+          min: 0,
+          max: 100,
+          color: ["red", "green"],
+          legend: (value) => value + '%'
+        },
+        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+        sorterParams: {
+          format: { // Provide formatting options
+            decimal: ".", // Use dot as decimal separator
+            thousand: "", // Don't use thousand separator
+          },
+        },
+      }
+    ],
+    layout: "fitColumns",
+    tooltips: true,
+    initialSort: [ // Specify initial sorting by "Win %" column in descending order
+      { column: "winPct", dir: "desc" },
+    ],
+  });
+}
+
+
 
 function handleTakeWager2(wager, currentUser, userGroup ) {
 
-  console.log('wagers: ' + wager);
+  console.log('wagers: ' + wager.bet365Id);
   // Check if the firstUser is the same as the currentUser
   if (wager.firstUser === currentUser) {
     console.error("Can't bet yourself");
@@ -283,34 +286,100 @@ function handleTakeWager2(wager, currentUser, userGroup ) {
       firstUser: wager.firstUser,
       betTaker: currentUser,
       sportId: wager.sportId,
-      eventId: wager.eventId,
+      eventId: wager.bet365Id,
       userGroup: userGroup,
+      leagueName: wager.leagueName,
+      _id: wager._id
     }),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('Bet accepted:', data.bets);
-      // Send a request to remove the accepted wager from the server
-      fetch('/remove-wager', {
+  .then(response => response.json())
+  .then(data => {
+      if (data.success) {
+          // Remove the wager card from the UI
+          const wagerCardElement = document.getElementById(`wager-card-${wager._id}`);
+          if (wagerCardElement) {
+              wagerCardElement.remove();
+          } else {
+              console.error('Wager card element not found');
+          }
+      } else {
+          console.error('Error processing wager:', data.message);
+      }
+  })
+  .catch(error => {
+      console.error('Error processing wager:', error.message);
+  });
+}
+
+
+async function fetchUserRecords() {
+    try {
+        const response = await fetch('/user-record-against-others');
+        const data = await response.json();
+        if (data.success) {
+            displayUserRecords(data.userRecords);
+        } else {
+            console.error('Failed to fetch user records:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching user records:', error.message);
+    }
+}
+
+function displayUserRecords(userRecords) {
+    // Parse winPercentage as a number
+    userRecords.forEach(record => {
+        record.winPercentage = parseFloat(record.winPercentage);
+    });
+
+    // Initialize Tabulator for the user records table
+    new Tabulator("#user-records-table", {
+        data: userRecords,
+        layout: "fitColumns",
+        columns: [
+            { title: "Opponent", field: "opponent" },
+            { title: "Wins", field: "wins" },
+            { title: "Losses", field: "losses" },
+            {
+                title: "Win Percentage",
+                field: "winPercentage",
+                formatter: "progress", // Use the progress formatter
+                formatterParams: {
+                    min: 0,
+                    max: 100,
+                    color: ["red", "green"],
+                    legend: (value) => value + '%' // Add percentage symbol to legend
+                }
+            }
+        ],
+        initialSort: [ // Sort by win percentage column in descending order
+            { column: "winPercentage", dir: "desc" }
+        ]
+    });
+}
+
+
+
+function deleteWager(wager) {
+    fetch('/remove-wager', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(wager), // Send the wager data to identify which wager to remove
-      })
-        .then((response) => response.json())
-        .then((removeData) => {
-          if (removeData.success) {
-            // Refresh the displayed wagers
-            fetchWagers();
-          } else {
-            console.error('Error removing wager:', removeData.message);
-            // Handle error and show an error message to the user
-          }
-        });
+        body: JSON.stringify({ wagerId: wager._id }), // Send the unique identifier of the wager
     })
-    .catch((error) => {
-      console.error('Error placing wager:', error.message);
-      // Handle error and show an error message to the user
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the wager card from the UI
+            document.getElementById(`wager-card-${wager._id}`).remove();
+        } else {
+            console.error('Error deleting wager:', data.message);
+            // Optionally, display an error message to the user
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting wager:', error.message);
+        // Optionally, display an error message to the user
     });
 }

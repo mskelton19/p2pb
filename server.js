@@ -237,7 +237,9 @@ const wagers = [];
 
 // Placing a wager
 app.post('/place-wager', express.json(), async (req, res) => {
-  const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, eventId } = req.body;
+  const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName } = req.body;
+
+  const wagerId = uuidv4();
 
   const newWager = {
     teamName,
@@ -249,7 +251,9 @@ app.post('/place-wager', express.json(), async (req, res) => {
     firstUser,
     group,
     sportId,
-    eventId,
+    bet365Id,
+    _id: wagerId,
+    leagueName,
   };
 
   try {
@@ -300,30 +304,23 @@ app.get('/wagers', (req, res) => {
   }
 });
 
-// remove wager when it becomes an accepted bet
 app.post('/remove-wager', express.json(), async (req, res) => {
-  const { teamName, openTeam, odds, wagerAmount, eventTime, firstUser } = req.body;
+    const { wagerId } = req.body;
 
-  try {
-    const result = await wagersCollection.deleteOne({
-      teamName,
-      openTeam,
-      odds,
-      wagerAmount,
-      eventTime,
-      firstUser
-    });
+    try {
+        const result = await wagersCollection.deleteOne({ _id: wagerId });
+        // Or, if you store UUID in a different field, use that field
+        // const result = await wagersCollection.deleteOne({ uuidField: wagerId });
 
-    if (result.deletedCount === 1) {
-      // console.log('Removed accepted wager from database');
-      res.json({ success: true, message: 'Wager removed successfully' });
-    } else {
-      res.json({ success: false, message: 'Wager not found' });
+        if (result.deletedCount === 1) {
+            res.json({ success: true, message: 'Wager removed successfully' });
+        } else {
+            res.json({ success: false, message: 'Wager not found' });
+        }
+    } catch (error) {
+        console.error('Error removing wager:', error);
+        res.status(500).send('Error removing wager');
     }
-  } catch (error) {
-    console.error('Error removing wager:', error);
-    res.status(500).send('Error removing wager');
-  }
 });
 
 
@@ -331,36 +328,36 @@ app.post('/remove-wager', express.json(), async (req, res) => {
 const savedBets = [];
 
 // Server-side route to save a bet
-app.post('/accepted-bet', express.json(), (req, res) => {
-  const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup } = req.body;
-
-  // Save the bet data to your storage system (e.g., a database)
-  // Example: Save the bet to an array for simplicity
-  const betData = {
-    originalPick,
-    acceptedPick,
-    originalOdds,
-    acceptedOdds,
-    wagerAmount,
-    gameTime,
-    firstUser,
-    betTaker,
-    sportId,
-    eventId,
-    userGroup,
-  };
-
-  // Push the bet data to an array (you can replace this with your storage solution)
-  savedBets.push(betData);
-
-  res.json({
-    success: true,
-    bets: betData,
-    message: 'Bet saved successfully' });
-});
+// app.post('/accepted-bet', express.json(), (req, res) => {
+//   const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup } = req.body;
+//
+//   // Save the bet data to your storage system (e.g., a database)
+//   // Example: Save the bet to an array for simplicity
+//   const betData = {
+//     originalPick,
+//     acceptedPick,
+//     originalOdds,
+//     acceptedOdds,
+//     wagerAmount,
+//     gameTime,
+//     firstUser,
+//     betTaker,
+//     sportId,
+//     eventId,
+//     userGroup,
+//   };
+//
+//   // Push the bet data to an array (you can replace this with your storage solution)
+//   savedBets.push(betData);
+//
+//   res.json({
+//     success: true,
+//     bets: betData,
+//     message: 'Bet saved successfully' });
+// });
 
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
-  const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup } = req.body;
+  const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, leagueName } = req.body;
 
   const betData = {
     originalPick,
@@ -374,16 +371,28 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     sportId,
     eventId,
     userGroup,
+    leagueName,
+    _id,
+    // Include other relevant fields
   };
 
   try {
     await acceptedBetsCollection.insertOne(betData);
-    res.json({ success: true, bets: betData, message: 'Bet saved successfully' });
-  } catch (error) {
-    console.error('Error saving bet:', error);
-    res.status(500).send('Error saving bet');
+
+    // Remove the wager from the wagers collection using wagerId
+  console.log('wagerId', _id);
+  const removeResult = await wagersCollection.deleteOne({ _id: _id });
+  if (removeResult.deletedCount === 0) {
+    throw new Error('Wager not found or already removed');
   }
+
+  res.json({ success: true, bets: betData, wagerId: _id, message: 'Bet saved and wager removed successfully' });
+} catch (error) {
+  console.error('Error saving bet:', error);
+  res.status(500).send('Error saving bet: ' + error.message);
+}
 });
+
 
 // db get route
 app.get('/accepted-bets', async (req, res) => {
@@ -477,57 +486,50 @@ app.get('/bet365-results/:eventId', async (req, res) => {
 
 app.post('/save-finished-event', async (req, res) => {
     const eventData = req.body;
-    const { originalTeamScore, acceptedTeamScore, originalOdds, acceptedOdds, originalUser, secondUser, wagerAmount, acceptedPick, originalPick, eventTime } = eventData;
+    const { originalTeamScore, acceptedTeamScore, originalOdds, acceptedOdds, originalUser, secondUser, wagerAmount, acceptedPick, originalPick, eventTime, _id, sportId, leagueName } = eventData;
 
-    console.log(eventTime)
+    console.log('leagueName', leagueName)
 
     try {
-        // Check if an event with the same eventId already exists in finishedBets
-        const existingEvent = await finishedBetsCollection.findOne({ eventId: eventData.eventId });
+        // Check if an event with the same _id already exists in finishedBets
+        const existingEvent = await finishedBetsCollection.findOne({ _id: _id });
 
         if (existingEvent) {
             res.json({ success: false, message: 'Event already exists in finished bets' });
             return;
-          }
+        }
 
+        const scoreWithOdds = (originalTeamScore + originalOdds);
 
-            // Generate a unique internal ID for the event
-                const internalEventId = uuidv4();
+        if (scoreWithOdds > acceptedTeamScore) {
+            eventData.winner = originalUser;
+            eventData.loser = secondUser;
+            eventData.winningTeam = originalPick;
+            eventData.losingTeam = acceptedPick;
+            eventData.winningScore = originalTeamScore;
+            eventData.losingScore = acceptedTeamScore;
+            eventData.winningOdds = originalOdds;
+            eventData.losingOdds = acceptedOdds;
+        } else if (scoreWithOdds < acceptedTeamScore) {
+            eventData.winner = secondUser;
+            eventData.loser = originalUser;
+            eventData.winningTeam = acceptedPick;
+            eventData.losingTeam = originalPick;
+            eventData.winningScore = acceptedTeamScore;
+            eventData.losingScore = originalTeamScore;
+            eventData.winningOdds = acceptedOdds;
+            eventData.losingOdds = originalOdds;
+        }
 
-                eventData.internalEventId = internalEventId;
-
-                const scoreWithOdds = (originalTeamScore + originalOdds);
-
-                if (scoreWithOdds > acceptedTeamScore){
-                    eventData.winningTeam = originalPick;
-                    eventData.losingTeam = acceptedPick;
-                    eventData.winner = originalUser;
-                    eventData.loser = secondUser;
-                    eventData.winningScore = originalTeamScore;
-                    eventData.losingScore = acceptedTeamScore;
-                    eventData.winningOdds = originalOdds;
-                    eventData.losingOdds = acceptedOdds;
-                } else if (scoreWithOdds < acceptedTeamScore) {
-                    eventData.winner = secondUser;
-                    eventData.loser = originalUser;
-                    eventData.winningTeam = acceptedPick;
-                    eventData.losingTeam = originalPick;
-                    eventData.winningScore = acceptedTeamScore;
-                    eventData.losingScore = originalTeamScore;
-                    eventData.winningOdds = acceptedOdds;
-                    eventData.losingOdds = originalOdds;
-                }
-
-                // Update wins and losses for winner and loser
-                await updateWinLoss(eventData.winner, true, wagerAmount); // true for a win
-                await updateWinLoss(eventData.loser, false, wagerAmount); // false for a loss
-
+        // Update wins and losses for winner and loser
+        await updateWinLoss(eventData.winner, true, wagerAmount); // true for a win
+        await updateWinLoss(eventData.loser, false, wagerAmount); // false for a loss
 
         // Save the event data to the finishedBets collection
         await finishedBetsCollection.insertOne(eventData);
 
         // Remove the event from the acceptedBets collection
-        const result = await acceptedBetsCollection.deleteOne({ eventId: eventData.eventId });
+        const result = await acceptedBetsCollection.deleteOne({ _id: _id });
 
         if (result.deletedCount === 1) {
             res.json({ success: true, message: 'Event moved to finished bets successfully' });
@@ -564,6 +566,7 @@ async function updateWinLoss(username, isWin, wagerAmount) {
         }
     );
 }
+
 
 
 // db route for finished events
@@ -653,6 +656,133 @@ app.get('/mygroup', async (req, res) => {
     res.redirect('/login');
   }
 });
+
+app.get('/sports-stats', async (req, res) => {
+  if (!req.isAuthenticated() || !req.user) {
+    return res.status(401).json({ success: false, error: 'User not authenticated' });
+  }
+
+  const currentUser = req.user.username;
+
+  try {
+    // Fetch finished bets directly from the finishedBetsCollection
+    const finishedBets = await finishedBetsCollection.find({
+      $or: [
+        { originalUser: currentUser },
+        { secondUser: currentUser }
+      ]
+    }).toArray();
+
+    // Process the finished bets to calculate sports stats
+    const statsBySport = calculateSportsStats(finishedBets, currentUser);
+    res.json(statsBySport);
+  } catch (error) {
+    console.error('Error fetching sports stats:', error);
+    res.status(500).send('Error fetching sports stats');
+  }
+});
+
+// Mapping of sport IDs to sport names
+// const sportIdToNameMapping = {
+//     '18': 'Basketball',
+//     '17': 'NHL',
+//     '12': 'Football',
+//     // Add other sportId to sport name mappings here
+// };
+
+function calculateSportsStats(finishedBets, currentUser) {
+  const statsByLeague = {};
+
+  finishedBets.forEach(bet => {
+    // Initialize the league stats if not already done
+    if (!statsByLeague[bet.leagueName]) {
+      statsByLeague[bet.leagueName] = { wins: 0, losses: 0, leagueName: bet.leagueName };
+    }
+
+    // Increment win or loss count based on whether the currentUser is the winner
+    if (bet.winner === currentUser) {
+      statsByLeague[bet.leagueName].wins++;
+    } else {
+      statsByLeague[bet.leagueName].losses++;
+    }
+  });
+
+  // Convert the stats object into an array and calculate win percentages
+  return Object.values(statsByLeague).map(league => ({
+    ...league,
+    winPct: calculateWinPercentage(league.wins, league.losses)
+  }));
+}
+
+function calculateWinPercentage(wins, losses) {
+  const totalGames = wins + losses;
+  return totalGames > 0 ? (wins / totalGames * 100).toFixed(2) : "0.00";
+}
+
+app.get('/user-record-against-others', async (req, res) => {
+    try {
+        const currentUser = req.user.username; // Assuming you have authentication middleware to get the current user
+        const userGroup = req.user.group; // Assuming you have a
+        const userRecords = await calculateUserRecords(currentUser, userGroup, req.user);
+        res.json({ success: true, userRecords });
+    } catch (error) {
+        console.error('Error calculating user records:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+async function calculateUserRecords(currentUser, userGroup, user) {
+  try {
+    // Query the database to get all users in the group
+    const groupUsers = await usersCollection.find({ group: userGroup }).toArray();
+
+    // Calculate the user's record against each opponent
+    const userRecords = [];
+    for (const groupUser of groupUsers) {
+      // Skip the current user
+      if (groupUser.username === currentUser) {
+        continue;
+      }
+
+      // Query the database to get the number of wins for the current user against this opponent
+      const wins = await finishedBetsCollection.countDocuments({
+        winner: currentUser,
+        loser: groupUser.username,
+      });
+
+      // Query the database to get the number of losses for the current user against this opponent
+      const losses = await finishedBetsCollection.countDocuments({
+        winner: groupUser.username,
+        loser: currentUser,
+      });
+
+      // Calculate the win percentage
+      const totalMatches = wins + losses;
+      const winPercentage = totalMatches === 0 ? 0 : (wins / totalMatches) * 100;
+
+      // Construct the record object
+      const record = {
+        opponent: groupUser.username,
+        wins,
+        losses,
+        winPercentage: winPercentage.toFixed(2) + '%', // Format win percentage
+      };
+
+      userRecords.push(record);
+    }
+
+    return userRecords;
+  } catch (error) {
+    console.error('Error calculating user records:', error);
+    throw error;
+  }
+}
+
+
+
+
+
+
 
 // Start the server
 app.listen(port, () => {

@@ -31,20 +31,38 @@
       </div>
       <!-- Menu Items -->
       <ul>
+        <li><a href="/mygroup">My Group</a></li>
         <li><a href="/mybets">My Bets</a></li>
         <li><a href="/my-stats">My Stats</a></li>
-        <li><a href="/mygroup">My Group</a></li>
       </ul>
     </div>
   </nav>
 
-  <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h3>
+  <div class="tabs">
+    <button class="tablinks active" onclick="openTab(event, 'Leaderboard')">Leaderboard</button>
+    <button class="tablinks" onclick="openTab(event, 'Stats')">Stats</button>
+    <button class="tablinks" onclick="openTab(event, 'Wagers')">Open Bets</button>
+  </div>
 
-  <div id="group-table"></div>
+  <!-- Leaderboard Tab Content -->
+ <div id="Leaderboard" class="tabcontent default-open">
+   <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h3>
+   <div id="group-table"></div>
+ </div>
 
-  <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Open Bets</h3>
-  <div id="wagers-container" class="wagers-container">
-    <!-- Wager cards will be dynamically added here -->
+ <!-- Stats Tab Content -->
+ <div id="Stats" class="tabcontent">
+     <h3 style="text-align:left; margin-top:20px;">Stats by Sport</h3>
+     <div id="sports-stats-table"></div>
+
+     <h3 style="text-align:left; margin-top:20px;">Record vs Others</h3>
+     <div id="user-records-table"></div> <!-- Add a container for user records -->
+ </div>
+
+ <!-- Stats Tab Content -->
+  <div id="Wagers" class="tabcontent">
+    <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Open Bets</h3>
+    <div id="wagers-container" class="wagers-container">
   </div>
 
   <!-- You can add more content or styling as needed -->
@@ -57,6 +75,22 @@
   var groupUsersData = <%- JSON.stringify(groupUsers) %>; // Pass the EJS data to a JavaScript variable
 </script>
 <script src="group.js"></script> <!-- Link to your custom JS file -->
+
+<script>
+   function openTab(evt, tabName) {
+     var i, tabcontent, tablinks;
+     tabcontent = document.getElementsByClassName("tabcontent");
+     for (i = 0; i < tabcontent.length; i++) {
+       tabcontent[i].style.display = "none";
+     }
+     tablinks = document.getElementsByClassName("tablinks");
+     for (i = 0; i < tablinks.length; i++) {
+       tablinks[i].className = tablinks[i].className.replace(" active", "");
+     }
+     document.getElementById(tabName).style.display = "block";
+     evt.currentTarget.className += " active";
+   }
+ </script>
 
 <a href="/games" class="floating-button">+</a>
 

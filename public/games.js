@@ -78,9 +78,6 @@ async function fetchEvents(sportId, leagueId) {
 
 
 function displayEventData(event, oddsData) {
-  // console.log('Displaying event and odds data:', event, oddsData);
-
-  // console.log(event)
 
   const eventsContainer = document.getElementById('events-container');
   eventsContainer.classList.add('events-container');
@@ -110,7 +107,7 @@ function displayEventData(event, oddsData) {
   homeContainer.appendChild(homeTeamCard);
 
   // Create odds card for home team
-  const homeOddsCard = createOddsCard(oddsData.handicap, eventCard, event.time, event.sport_id, event.id);
+  const homeOddsCard = createOddsCard(oddsData.handicap, eventCard, event.time, event.sport_id, event.id, event.league.name);
   homeContainer.appendChild(homeOddsCard);
 
   // Append the home container to the event card
@@ -125,7 +122,7 @@ function displayEventData(event, oddsData) {
   awayContainer.appendChild(awayTeamCard);
 
   // Create odds card for away team
-  const awayOddsCard = createOddsCard(oddsData.handicap * -1, eventCard, event.time, event.sport_id, event.id);
+  const awayOddsCard = createOddsCard(oddsData.handicap * -1, eventCard, event.time, event.sport_id, event.id, event.league.name);
   awayContainer.appendChild(awayOddsCard);
 
   // Append the card to the main container
@@ -150,7 +147,9 @@ function createTeamCard(teamName) {
 // Declare a global variable to store the selected odds card
 let selectedOddsCard = null;
 
-function createOddsCard(odds, eventCard, eventTime, sportId, eventId) {
+function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName) {
+
+  console.log(leagueName)
 
   const oddsCard = document.createElement('div');
   oddsCard.classList.add('odds-card');
@@ -191,7 +190,7 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId) {
 
     // Show the drawer with team name, odds, and event time
     if (selectedOdds) {
-      showDrawer(homeTeamName, awayTeamName, teamName, selectedOdds, eventTime);
+      showDrawer(homeTeamName, awayTeamName, teamName, selectedOdds, eventTime, leagueName);
     } else {
       hideDrawer();
     }
@@ -202,13 +201,9 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId) {
 
 
 function getUserTimeZoneDateTime(timestamp) {
-  // console.log("Original Timestamp:", timestamp); // For debugging
 
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTime = new Date(timestamp * 1000);
-
-  // console.log("Converted Date:", eventTime); // For debugging
-  // console.log("User Time Zone:", userTimeZone); // For debugging
 
   // Define the formatting options
   const dateFormatOptions = {
@@ -233,7 +228,7 @@ function getUserTimeZoneDateTime(timestamp) {
 }
 
 
-function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime) {
+function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime, leagueName) {
   const drawer = document.getElementById('drawer');
 
   const formattedOdds = odds > 0 ? `+${odds}` : odds;
@@ -246,13 +241,6 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime) {
   // Parse eventTime as a Date object
   const parsedEventTime = new Date(parseInt(eventTime));
 
-  // Check if parsedEventTime is a valid date
-  // if (!isNaN(parsedEventTime.getTime())) {
-  //   document.getElementById('drawerEventTime').textContent = `${getUserTimeZoneDateTime(parsedEventTime)}`;
-  // } else {
-  //   document.getElementById('drawerEventTime').textContent = 'Invalid Event Time';
-  // }
-
   const teamNames = { homeTeamName, awayTeamName };
   // console.log(getUserTimeZoneDateTime(parsedEventTime))
 
@@ -260,7 +248,7 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime) {
   const confirmButton = document.getElementById('confirmButton');
   confirmButton.onclick = function () {
     // confirmWager(teamNames, getUserTimeZoneDateTime(parsedEventTime), username);
-    confirmWager2(teamNames, getUserTimeZoneDateTime(parsedEventTime), username);
+    confirmWager2(teamNames, getUserTimeZoneDateTime(parsedEventTime), username, leagueName);
   };
 
   drawer.style.height = 'auto';
@@ -287,60 +275,10 @@ function hideDrawer() {
   }
 }
 
-
-// // Add this function to handle confirming the wager
-// function confirmWager(teamNames, eventTime, username) {
-//
-//   // Pass along original pick
-//   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
-//   // Pass along taken odds
-//   const drawerOdds = document.getElementById('drawerOdds').textContent;
-//   // Pass along wager amount
-//   const wagerInput = document.getElementById('wagerInput').value.trim();
-//   // Pass along available team
-//   const otherTeamName = teamNames.homeTeamName === drawerTeamName ? teamNames.awayTeamName : teamNames.homeTeamName;
-//
-//   const gameTime = eventTime;
-//
-//   const sportId = selectedOddsCard.dataset.sportId;
-//   const eventId = selectedOddsCard.dataset.eventId;
-//
-//   // Save the wager
-//   if (wagerInput !== '') {
-//     fetch('/place-wager', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         teamName: drawerTeamName,
-//         openTeam: otherTeamName,
-//         takenOdds: parseFloat(drawerOdds),
-//         openOdds: (drawerOdds * -1),
-//         wager: parseFloat(wagerInput),
-//         eventTime: gameTime,
-//         firstUser: username,
-//         group: userGroup,
-//         sportId: sportId,
-//         eventId: eventId,
-//       }),
-//     })
-//       .then(response => response.json())
-//       .then(data => {
-//         console.log('Wager placed:', data.wager);
-//         // Handle success or show a confirmation message to the user
-//       })
-//       .catch(error => {
-//         console.error('Error placing wager:', error.message);
-//         // Handle error and show an error message to the user
-//       });
-//   } else {
-//     console.log('Please enter a wager before confirming.');
-//   }
-// }
-
 // Add this function to handle confirming the wager
-function confirmWager2(teamNames, eventTime, username) {
+function confirmWager2(teamNames, eventTime, username, leagueName) {
+
+  console.log(leagueName)
 
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
@@ -373,7 +311,8 @@ function confirmWager2(teamNames, eventTime, username) {
         firstUser: username,
         group: userGroup,
         sportId: sportId,
-        eventId: eventId,
+        bet365Id: eventId,
+        leagueName: leagueName,
       }),
     })
       .then(response => response.json())

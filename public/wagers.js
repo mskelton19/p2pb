@@ -184,6 +184,7 @@ function handleTakeWager(wager, currentUser, userGroup ) {
       sportId: wager.sportId,
       eventId: wager.eventId,
       userGroup: userGroup,
+      leagueName: wager.leagueName,
     }),
   })
     .then((response) => response.json())

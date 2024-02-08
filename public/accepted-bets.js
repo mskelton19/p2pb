@@ -61,7 +61,6 @@ function setupTabs() {
 
 // Fetch finished bets from the server
 async function fetchFinishedBets() {
-  console.log('in fetchFinishedBets')
   try {
     const response = await fetch('/finished-bets');
     if (response.ok) {
@@ -118,7 +117,6 @@ function createFinishedBetCard(bet) {
 }
 
 function createBetCard(bet) {
-  console.log('here')
     // Create the main card element
     const betCard = document.createElement('div');
     betCard.classList.add('bet-card');
@@ -138,8 +136,6 @@ function createBetCard(bet) {
     // Container for team names, user names, and scores
     const infoContainer = document.createElement('div');
     infoContainer.classList.add('info-container');
-
-    console.log('progress');
 
     // Original pick, first user, and scores
     const originalPickDiv = document.createElement('div');
@@ -177,6 +173,7 @@ async function displayAcceptedBets(acceptedBets) {
   finishedEventsContainer.innerHTML = '';
 
   for (const bet of acceptedBets) {
+    // console.log(bet)
     if (bet.firstUser === currentUser || bet.betTaker === currentUser) {
       const betCard = createBetCard(bet);
       const eventDateTime = new Date(bet.gameTime);
@@ -184,12 +181,10 @@ async function displayAcceptedBets(acceptedBets) {
 
       if (eventDateTime > now) {
         // Event is upcoming
-        console.log(acceptedBets)
         upcomingEventsContainer.appendChild(betCard);
       } else {
         // Check if the event has finished
         const results = await fetchBet365Results(bet.eventId);
-        console.log(results)
         if (results && isEventFinished(results)) {
           // Event is finished, update final scores
           const sportId = results.results[0].sport_id;
@@ -371,6 +366,7 @@ function updateFinalScores(betCard, resultsData, bet, sportId) {
 
 async function moveEventToFinished2(eventId, bet, scores) {
 
+  console.log('league', bet.leagueName);
   console.log('bets', bet)
 
     const eventData = {
@@ -385,6 +381,9 @@ async function moveEventToFinished2(eventId, bet, scores) {
         originalUser: bet.firstUser,
         secondUser: bet.betTaker,
         eventTime: bet.gameTime,
+        sportId: bet.sportId,
+        leagueName: bet.leagueName,
+        _id: bet._id,
     };
 
     try {
