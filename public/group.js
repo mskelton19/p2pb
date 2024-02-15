@@ -341,7 +341,7 @@ function displayUserRecords(userRecords) {
             { title: "Wins", field: "wins" },
             { title: "Losses", field: "losses" },
             {
-                title: "Win Percentage",
+                title: "Win %",
                 field: "winPercentage",
                 formatter: "progress", // Use the progress formatter
                 formatterParams: {

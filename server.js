@@ -32,6 +32,7 @@ const wagersCollection = db.collection("openWagers");
 const acceptedBetsCollection = db.collection("acceptedBets");
 const finishedBetsCollection = db.collection("finishedBets");
 const usersCollection = db.collection("users");
+const groupsCollection = db.collection("groups");
 
 // Shutting down the database when the server goes down
 process.on('SIGINT', async () => {
@@ -75,34 +76,57 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.post('/register', async (req, res) => {
-  const { username, password, group } = req.body;
+  // Destructure groupName from req.body now, instead of group
+  const { username, password, groupName, groupPassword } = req.body;
   const saltRounds = 10;
 
+  console.log(groupName, groupPassword); // This should now correctly log "AA" and "bets"
+
   try {
-    // Hash the password
-    const hash = await bcrypt.hash(password, saltRounds);
-    console.log('Password hashed');
+    // Use groupName when querying the database
+    const groupDoc = await groupsCollection.findOne({ groupName: groupName });
+ // Adjust 'groupName' to the actual field name in your groups collection
 
-    // Store user with hashed password
-    const newUser = { username, password: hash, group, wins: 0, losses: 0 };
-    await usersCollection.insertOne(newUser);
-    console.log('User saved');
+    // If the group exists, verify the group password
+    if (groupDoc) {
+      // Assuming group passwords are also hashed and stored securely
+      const passwordMatch = await bcrypt.compare(groupPassword, groupDoc.password);
+      if (!passwordMatch) {
+        // If the group password does not match, send an error response
+        return res.status(400).json({ success: false, message: 'Incorrect group password.' });
+      }
 
-    res.redirect('/login'); // Redirect to login after successful registration
+      // If the group password matches, hash the user's password
+      const hash = await bcrypt.hash(password, saltRounds);
+      console.log('Password hashed');
+
+      // Store user with hashed password, including the group
+      const newUser = { username, password: hash, group: groupDoc.groupName, wins: 0, losses: 0 }; // Adjust as needed
+      await usersCollection.insertOne(newUser);
+      console.log('User saved');
+
+      // Optionally, redirect to login or send a success response
+      res.redirect('/login'); // Or res.json({ success: true });
+    } else {
+      // If the group does not exist, send an error response
+      return res.status(400).json({ success: false, message: 'Group not found.' });
+    }
   } catch (err) {
     console.error('Registration error:', err);
-    res.redirect('/register'); // Redirect back to registration on error
+    res.status(500).json({ success: false, message: 'Server error during registration.' }); // Adjust error handling as needed
   }
+  // No need for a finally block to close the database connection if you're using a persistent connection
 });
+
+
 
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
-
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
@@ -157,8 +181,6 @@ app.post('/login', async (req, res, next) => {
     res.redirect('/login'); // Redirect back to login on failure
   }
 });
-
-
 
 // Render games.ejs page
 app.get('/games', (req, res) => {
@@ -327,35 +349,6 @@ app.post('/remove-wager', express.json(), async (req, res) => {
 // Declare savedBets as a global array
 const savedBets = [];
 
-// Server-side route to save a bet
-// app.post('/accepted-bet', express.json(), (req, res) => {
-//   const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup } = req.body;
-//
-//   // Save the bet data to your storage system (e.g., a database)
-//   // Example: Save the bet to an array for simplicity
-//   const betData = {
-//     originalPick,
-//     acceptedPick,
-//     originalOdds,
-//     acceptedOdds,
-//     wagerAmount,
-//     gameTime,
-//     firstUser,
-//     betTaker,
-//     sportId,
-//     eventId,
-//     userGroup,
-//   };
-//
-//   // Push the bet data to an array (you can replace this with your storage solution)
-//   savedBets.push(betData);
-//
-//   res.json({
-//     success: true,
-//     bets: betData,
-//     message: 'Bet saved successfully' });
-// });
-
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
   const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, leagueName } = req.body;
 
@@ -393,7 +386,6 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 }
 });
 
-
 // db get route
 app.get('/accepted-bets', async (req, res) => {
   try {
@@ -428,9 +420,6 @@ app.get('/mybets', async (req, res) => {
   }
 });
 
-
-
-
 // app.get('/groupbets', (req, res) => {
 //   if (req.session.passport && req.session.passport.user) {
 //     const group = req.session.passport.user.group;
@@ -447,7 +436,6 @@ app.get('/userdata', (req, res) => {
     res.status(401).json({error: 'User data not available'})
   }
 });
-
 
 app.get('/bet365-data/:eventId', async (req, res) => {
   const eventId = req.params.eventId;
@@ -467,10 +455,7 @@ app.get('/bet365-data/:eventId', async (req, res) => {
   }
 });
 
-
-
 // server.js
-
 app.get('/bet365-results/:eventId', async (req, res) => {
   const eventId = req.params.eventId;
   const url = `https://api.b365api.com/v1/bet365/result?token=${apiKey}&event_id=${eventId}`;
@@ -566,8 +551,6 @@ async function updateWinLoss(username, isWin, wagerAmount) {
         }
     );
 }
-
-
 
 // db route for finished events
 app.get('/saved-events', async (req, res) => {
@@ -682,14 +665,6 @@ app.get('/sports-stats', async (req, res) => {
   }
 });
 
-// Mapping of sport IDs to sport names
-// const sportIdToNameMapping = {
-//     '18': 'Basketball',
-//     '17': 'NHL',
-//     '12': 'Football',
-//     // Add other sportId to sport name mappings here
-// };
-
 function calculateSportsStats(finishedBets, currentUser) {
   const statsByLeague = {};
 
@@ -778,11 +753,16 @@ async function calculateUserRecords(currentUser, userGroup, user) {
   }
 }
 
-
-
-
-
-
+// Fetch groups from MongoDB
+app.get('/groups', async (req, res) => {
+    try {
+        const groups = await groupsCollection.find({}).toArray();
+        res.json(groups);
+    } catch (error) {
+        console.error('Error fetching groups:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Start the server
 app.listen(port, () => {

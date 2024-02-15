@@ -4,54 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="register.css">
 </head>
 <body>
     <form action="/register" method="POST">
         <h2>Register</h2>
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
-        <input type="text" name="group" placeholder="Group" required>
+        <select id="groupSelect" name="group" required>
+            <option value="">Select Group</option>
+            <!-- Group options will be dynamically filled -->
+        </select>
+        <!-- The group password input will be dynamically added here -->
         <input type="submit" value="Register">
     </form>
+    <script src="register.js"></script>
 </body>
 </html>

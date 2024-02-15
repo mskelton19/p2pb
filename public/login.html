@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+    body, html {
+              height: 100%;
+              margin: 0;
+              font-family: Arial, sans-serif;
+              background-color: #ffffff; /* White background */
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+              color: #333; /* Darker text color for visibility */
+          }
+
+          h1 {
+              margin-top: -20px; /* Moves the H1 higher up the page */
+              margin-bottom: 40px; /* Increases space below the H1 */
+      }
+
+
+          .login-form {
+              display: flex;
+              flex-direction: column;
+              width: 90%;
+              max-width: 400px; /* Adjust based on preference */
+              margin: auto; /* Center the form in the page */
+          }
+
+          .form-group {
+              text-align: left; /* Aligns the label to the left */
+              margin-bottom: 15px;
+              display: flex;
+              flex-direction: column;
+              align-items: center; /* Center align the input fields */
+          }
+
+          .form-group label {
+              align-self: flex-start; /* Aligns the label to the start (left) */
+              font-weight: bold;
+              margin-bottom: 5px; /* Space between label and input */
+          }
+
+          .form-group input {
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 3px;
+              width: 100%; /* Full width of the form-group */
+              box-sizing: border-box; /* Includes padding and border in the element's total width */
+          }
+
+          .form-group input[type="submit"] {
+              background-color: #007bff;
+              color: #fff;
+              cursor: pointer;
+              padding: 10px;
+              border-radius: 3px;
+              width: 100%;
+              margin-top: 5px;
+              border: none;
+          }
+
+          .form-group input[type="submit"]:hover {
+              background-color: #0056b3;
+          }
+
+
+
+          .register-link a {
+              color: #007bff;
+              text-decoration: none;
+          }
+
+          .register-link a:hover {
+              text-decoration: underline;
+          }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>ChalkIQ</h1>
+        <form class="login-form" action="/login" method="post">
+          <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" required>
+          </div>
+          <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required>
+          </div>
+          <div class="form-group">
+              <input type="submit" value="Login">
+          </div>
+        </form>
+        <div class="register-link">
+           <a href="/register">Don't have an account? Register here</a>
+       </div>
+    </div>
+</body>
+</html>
