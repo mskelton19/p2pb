@@ -80,46 +80,38 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  // Destructure groupName from req.body now, instead of group
-  const { username, password, groupName, groupPassword } = req.body;
-  const saltRounds = 10;
+    const { username, password, groupName, groupPassword } = req.body;
 
-  console.log(groupName, groupPassword); // This should now correctly log "AA" and "bets"
+    // console.log(groupPassword)
 
-  try {
-    // Use groupName when querying the database
-    const groupDoc = await groupsCollection.findOne({ groupName: groupName });
- // Adjust 'groupName' to the actual field name in your groups collection
+    try {
+        const groupDoc = await groupsCollection.findOne({ groupName: groupName });
+        if (!groupDoc) {
+            return res.status(400).json({ success: false, message: 'Group not found.' });
+        }
 
-    // If the group exists, verify the group password
-    if (groupDoc) {
-      // Assuming group passwords are also hashed and stored securely
-      const passwordMatch = await bcrypt.compare(groupPassword, groupDoc.password);
-      if (!passwordMatch) {
-        // If the group password does not match, send an error response
-        return res.status(400).json({ success: false, message: 'Incorrect group password.' });
-      }
+        // Directly compare the submitted groupPassword with the stored hash
+        const passwordMatch = await bcrypt.compare(groupPassword, groupDoc.password);
+        if (!passwordMatch) {
+            return res.status(400).json({ success: false, message: 'Incorrect group password.' });
+        }
 
-      // If the group password matches, hash the user's password
-      const hash = await bcrypt.hash(password, saltRounds);
-      console.log('Password hashed');
+        // If the group password matches, proceed with hashing the user's password and the rest of the registration process
+        const hash = await bcrypt.hash(password, 10); // Adjust the salt rounds if necessary
+        // Create the user document including the groupName
+        const newUser = { username, password: hash, groupName };
+        console.log(newUser);
+        await usersCollection.insertOne(newUser);
 
-      // Store user with hashed password, including the group
-      const newUser = { username, password: hash, group: groupDoc.groupName, wins: 0, losses: 0 }; // Adjust as needed
-      await usersCollection.insertOne(newUser);
-      console.log('User saved');
+        // Optionally, you can clear the session's groupPasswordHash if it was previously set in another operation
+        req.session.groupPasswordHash = null;
 
-      // Optionally, redirect to login or send a success response
-      res.redirect('/login'); // Or res.json({ success: true });
-    } else {
-      // If the group does not exist, send an error response
-      return res.status(400).json({ success: false, message: 'Group not found.' });
+        // Registration successful, proceed with the response
+        return res.json({ success: true, redirectUrl: '/login?registration=success' });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ success: false, message: 'Server error during registration.' });
     }
-  } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ success: false, message: 'Server error during registration.' }); // Adjust error handling as needed
-  }
-  // No need for a finally block to close the database connection if you're using a persistent connection
 });
 
 
@@ -762,6 +754,23 @@ app.get('/groups', async (req, res) => {
         console.error('Error fetching groups:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+app.post('/create-group', async (req, res) => {
+    const { groupName, groupPassword } = req.body;
+    try {
+        const hash = await bcrypt.hash(groupPassword, 10);
+        await groupsCollection.insertOne({ groupName, password: hash });
+        // Assuming group creation is successful, send back a response indicating success and the groupName
+        res.json({ success: true, message: 'Group created successfully.', groupName: groupName });
+    } catch (error) {
+        console.error('Error creating group:', error);
+        res.status(500).json({ success: false, message: 'Server error while creating group.' });
+    }
+});
+
+app.get('/create-group', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'create-group.html'));
 });
 
 // Start the server

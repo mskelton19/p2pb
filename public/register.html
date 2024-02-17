@@ -15,9 +15,26 @@
             <option value="">Select Group</option>
             <!-- Group options will be dynamically filled -->
         </select>
+        <input type="password" name="groupPassword" placeholder="Group Password" required>
         <!-- The group password input will be dynamically added here -->
         <input type="submit" value="Register">
+        <a href="#" id="createGroupLink">Create Group</a>
     </form>
+
+<!-- Create Group Modal (hidden by default) -->
+<div id="createGroupModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create New Group</h2>
+        <input type="text" id="newGroupName" placeholder="Group Name" required>
+        <input type="password" id="newGroupPassword" placeholder="Group Password" required>
+        <button id="submitNewGroup">Create Group</button>
+    </div>
+</div>
+
+<!-- Place this somewhere in your HTML where it can be styled appropriately -->
+<div id="toast" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: black; color: white; padding: 12px 24px; border-radius: 4px; z-index: 1000;">Toast message</div>
+
     <script src="register.js"></script>
 </body>
 </html>
