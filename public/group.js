@@ -358,8 +358,6 @@ function displayUserRecords(userRecords) {
     });
 }
 
-
-
 function deleteWager(wager) {
     fetch('/remove-wager', {
         method: 'POST',
@@ -382,4 +380,27 @@ function deleteWager(wager) {
         console.error('Error deleting wager:', error.message);
         // Optionally, display an error message to the user
     });
+}
+
+function displayMyBets() {
+  const myBetsContainer = document.getElementById('my-bets-container');
+  myBetsContainer.innerHTML = ''; // Clear existing content
+
+  acceptedBetsData.forEach(bet => {
+    // Create elements for each bet and append to myBetsContainer
+    const betDiv = document.createElement('div');
+    betDiv.classList.add('bet');
+
+    const details = `
+      <div class="bet-details">
+        <div><strong>Event:</strong> ${bet.event}</div>
+        <div><strong>Wager:</strong> $${bet.wagerAmount}</div>
+        <div><strong>Odds:</strong> ${bet.odds}</div>
+        <div><strong>Status:</strong> ${bet.status}</div>
+      </div>
+    `;
+
+    betDiv.innerHTML = details;
+    myBetsContainer.appendChild(betDiv);
+  });
 }
