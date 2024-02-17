@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     groupSelect.innerHTML = '<option value="">Select Group</option>';
                     groups.forEach(group => {
                         const option = document.createElement('option');
-                        option.value = group.groupName; // Assuming your group objects have a groupName field
-                        option.textContent = group.groupName;
+                        option.value = group.group; // Assuming your group objects have a groupName field
+                        option.textContent = group.group;
                         groupSelect.appendChild(option);
                     });
                 }
@@ -21,12 +21,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // Function to pre-select the group name if provided in URL parameters
     function preSelectGroupName() {
         const urlParams = new URLSearchParams(window.location.search);
-        const groupName = urlParams.get('groupName');
-        if (groupName) {
+        const group = urlParams.get('group');
+        if (group) {
             const groupSelect = document.getElementById('groupSelect');
             if (groupSelect) {
                 Array.from(groupSelect.options).forEach(option => {
-                    if (option.value === groupName) {
+                    if (option.value === group) {
                         option.selected = true;
                     }
                 });
@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Handle the creation of a new group via the modal
     document.getElementById("submitNewGroup").addEventListener("click", function() {
-        var groupName = document.getElementById("newGroupName").value;
+        var group = document.getElementById("newGroup").value;
         var groupPassword = document.getElementById("newGroupPassword").value;
 
         fetch('/create-group', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ groupName, groupPassword }),
+            body: JSON.stringify({ group, groupPassword }),
         })
         .then(response => response.json())
         .then(data => {
@@ -72,9 +72,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 showToast("Group created successfully!");
                 modal.style.display = "none";
                 const groupSelect = document.getElementById('groupSelect');
-                const option = new Option(groupName, groupName, true, true);
+                const option = new Option(group, group, true, true);
                 groupSelect.add(option);
-                groupSelect.value = groupName; // Automatically select the newly created group
+                groupSelect.value = group; // Automatically select the newly created group
             } else {
                 showToast("Failed to create group.");
             }
@@ -95,14 +95,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const username = document.querySelector('input[name="username"]').value;
         const password = document.querySelector('input[name="password"]').value;
-        const groupName = document.querySelector('select[name="group"]').value;
+        const group = document.querySelector('select[name="group"]').value;
         const groupPasswordInput = form.querySelector('input[name="groupPassword"]');
         const groupPassword = groupPasswordInput ? groupPasswordInput.value : '';
 
         const payload = {
             username,
             password,
-            groupName,
+            group,
             groupPassword,
         };
 

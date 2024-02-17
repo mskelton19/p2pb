@@ -276,9 +276,10 @@ function hideDrawer() {
 }
 
 // Add this function to handle confirming the wager
-function confirmWager2(teamNames, eventTime, username, leagueName) {
+function confirmWager2(teamNames, eventTime, username, leagueName, group) {
 
-  console.log(leagueName)
+  // console.log(group)
+  console.log(group)
 
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;

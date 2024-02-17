@@ -66,8 +66,11 @@ app.use(bodyParser.json());
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -79,13 +82,23 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/signout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    // Destroy the session and redirect the user.
+    req.session.destroy(() => {
+      res.redirect('/login');
+    });
+  });
+});
+
 app.post('/register', async (req, res) => {
-    const { username, password, groupName, groupPassword } = req.body;
+    const { username, password, group, groupPassword } = req.body;
 
     // console.log(groupPassword)
 
     try {
-        const groupDoc = await groupsCollection.findOne({ groupName: groupName });
+        const groupDoc = await groupsCollection.findOne({ group: group });
         if (!groupDoc) {
             return res.status(400).json({ success: false, message: 'Group not found.' });
         }
@@ -99,7 +112,7 @@ app.post('/register', async (req, res) => {
         // If the group password matches, proceed with hashing the user's password and the rest of the registration process
         const hash = await bcrypt.hash(password, 10); // Adjust the salt rounds if necessary
         // Create the user document including the groupName
-        const newUser = { username, password: hash, groupName };
+        const newUser = { username, password: hash, group };
         console.log(newUser);
         await usersCollection.insertOne(newUser);
 
@@ -130,9 +143,6 @@ passport.use(new LocalStrategy(
     }
   }
 ));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 // After successful authentication, store user information in the session
 passport.serializeUser((user, done) => {
@@ -252,6 +262,8 @@ const wagers = [];
 // Placing a wager
 app.post('/place-wager', express.json(), async (req, res) => {
   const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName } = req.body;
+
+  console.log('group', group);
 
   const wagerId = uuidv4();
 
@@ -757,12 +769,12 @@ app.get('/groups', async (req, res) => {
 });
 
 app.post('/create-group', async (req, res) => {
-    const { groupName, groupPassword } = req.body;
+    const { group, groupPassword } = req.body;
     try {
         const hash = await bcrypt.hash(groupPassword, 10);
-        await groupsCollection.insertOne({ groupName, password: hash });
+        await groupsCollection.insertOne({ group, password: hash });
         // Assuming group creation is successful, send back a response indicating success and the groupName
-        res.json({ success: true, message: 'Group created successfully.', groupName: groupName });
+        res.json({ success: true, message: 'Group created successfully.', group: group });
     } catch (error) {
         console.error('Error creating group:', error);
         res.status(500).json({ success: false, message: 'Server error while creating group.' });
