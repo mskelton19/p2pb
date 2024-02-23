@@ -1,42 +1,297 @@
-var table = new Tabulator("#group-table", {
-  data: groupUsersData,
-  columns: [
-    { title: "User", field: "username" },
-    { title: "Wins", field: "wins" },
-    { title: "Losses", field: "losses" },
-    {
-      title: "Win %",
-      field: "winPct",
-      formatter: function(cell, formatterParams) {
-        var value = cell.getValue();
-        if (value === undefined || value === null || isNaN(value)) {
-          return "0%";
-        }
-        return (value * 100).toFixed(2) + '%';
-      },
-      sorter: "number", // Specify the sorter as "number" to ensure correct sorting
-      sorterParams: {
-        format: { // Provide formatting options
-          decimal: ".", // Use dot as decimal separator
-          thousand: "", // Don't use thousand separator
+document.addEventListener('DOMContentLoaded', () => {
+  setupGroupPage();
+  setupTabListeners();
+  fetchSportsStats();
+  fetchUserRecords();
+  // startLiveScoreUpdates(); // Start the live score updates
+})
+
+// -------------------------group page tabs-------------------------------
+
+function setupTabListeners() {
+  document.getElementById('statsTab').addEventListener('click', function() { openTab('stats'); });
+  document.getElementById('wagersTab').addEventListener('click', function() { openTab('wagers'); });
+  document.getElementById('myBetsTab').addEventListener('click', function() { openTab('myBets'); });
+}
+
+function openTab(tabName) {
+  // Hide all tab content
+  var tabcontent = document.getElementsByClassName("tabcontent");
+  Array.from(tabcontent).forEach(function(element) {
+    element.style.display = "none";
+  });
+
+  // Remove 'active' class from all tab buttons
+  var tablinks = document.getElementsByClassName("tablinks");
+  Array.from(tablinks).forEach(function(element) {
+    element.classList.remove("active");
+  });
+
+  // Show the current tab content and add 'active' class to the button
+  document.getElementById(tabName).style.display = "block";
+
+  var tabButton = document.getElementById(tabName + 'Tab');
+  if (tabButton) {
+    tabButton.classList.add("active");
+  } else {
+    console.error('Tab button not found:', tabName + 'Tab');
+  }
+
+  if (tabName === 'myBets') {
+    setupMyBetsTabs();
+    // Make sure to call fetchAndDisplayMyBets() here to populate the bets
+    // fetchAndDisplayMyBets();
+    // Automatically open the "Upcoming Bets" sub-tab
+    document.getElementById('my-bets-tab-upcoming').click();
+  }
+}
+
+// -----------------------Open My Bets Tab -------------------------------
+function openSubTab(subTabName) {
+  // Similar logic to openTab but for handling sub-tabs within My Bets
+  var subTabContent = document.getElementsByClassName("sub-tabcontent");
+  Array.from(subTabContent).forEach(function(element) {
+    element.style.display = "none";
+  });
+
+  var subTabLinks = document.getElementsByClassName("sub-tablinks");
+  Array.from(subTabLinks).forEach(function(element) {
+    element.className = element.className.replace(" active", "");
+  });
+
+  document.getElementById(subTabName).style.display = "block";
+  // No need for active class adjustment as it's done within the buttons themselves
+}
+
+
+// ------------------------Stats Tab----------------------------------------
+function setupGroupPage(){
+
+  console.log(groupUsersData);
+
+  var table = new Tabulator("#group-table", {
+    data: groupUsersData,
+    columns: [
+      { title: "User", field: "username" },
+      { title: "Wins", field: "wins" },
+      { title: "Losses", field: "losses" },
+      {
+        title: "Win %",
+        field: "winPct",
+        formatter: function(cell, formatterParams) {
+            var value = cell.getValue();
+            return value ? value + '%' : "0%"; // Directly append '%' to the value
+          },
+        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+        sorterParams: {
+          format: { // Provide formatting options
+            decimal: ".", // Use dot as decimal separator
+            thousand: "", // Don't use thousand separator
+          },
         },
-      },
+      }
+    ],
+    layout: "fitColumns",
+    pagination: "local",
+    paginationSize: 10,
+    responsiveLayout: "hide",
+    tooltips: true,
+    addRowPos: "top",
+    history: true,
+    movableColumns: true,
+    initialSort: [ // Specify initial sorting by "Win %" column in descending order
+      { column: "winPct", dir: "desc" },
+    ],
+  })
+};
+
+
+async function fetchSportsStats() {
+  try {
+    const response = await fetch('/sports-stats');
+    if (response.ok) {
+      const sportsStats = await response.json();
+      console.log('sports stats', sportsStats);
+      populateSportsStatsTable(sportsStats);
+    } else {
+      console.error('Failed to fetch sports stats:', response.statusText);
     }
-  ],
-  layout: "fitColumns",
-  pagination: "local",
-  paginationSize: 10,
-  responsiveLayout: "hide",
-  tooltips: true,
-  addRowPos: "top",
-  history: true,
-  movableColumns: true,
-  initialSort: [ // Specify initial sorting by "Win %" column in descending order
-    { column: "winPct", dir: "desc" },
-  ],
-});
+  } catch (error) {
+    console.error('Error fetching sports stats:', error);
+  }
+}
+
+function populateSportsStatsTable(sportsStats) {
+  new Tabulator("#sports-stats-table", {
+    data: sportsStats,
+    columns: [
+      { title: "Sport", field: "leagueName" },
+      { title: "Wins", field: "wins" },
+      { title: "Losses", field: "losses" },
+      {
+        title: "Win %",
+        field: "winPct",
+        formatter: "progress",
+        formatterParams: {
+          min: 0,
+          max: 100,
+          color: ["red", "green"],
+          legend: (value) => value + '%'
+        },
+        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+        sorterParams: {
+          format: { // Provide formatting options
+            decimal: ".", // Use dot as decimal separator
+            thousand: "", // Don't use thousand separator
+          },
+        },
+      }
+    ],
+    layout: "fitColumns",
+    tooltips: true,
+    initialSort: [ // Specify initial sorting by "Win %" column in descending order
+      { column: "winPct", dir: "desc" },
+    ],
+  });
+}
+
+// ----------------------My Bets----------------------------------------
+
+function setupMyBetsTabs() {
+  // Assuming you have similar buttons or links acting as tabs within your "My Bets" tab
+  const upcomingTab = document.getElementById('my-bets-tab-upcoming');
+  const inProgressTab = document.getElementById('my-bets-tab-inprogress');
+  const finishedTab = document.getElementById('my-bets-tab-finished');
+
+  // Sections
+  const upcomingSection = document.getElementById('my-upcoming-events-section');
+  const inProgressSection = document.getElementById('my-in-progress-events-section');
+  const finishedSection = document.getElementById('my-finished-events-section');
+
+  // Setting default display setup
+ resetMyBetsDisplay();
+
+ // Adding event listeners to each tab
+ upcomingTab.addEventListener('click', () => {
+   resetMyBetsDisplay();
+   upcomingSection.style.display = 'block';
+   fetchAcceptedBets('upcoming');
+ });
+
+ inProgressTab.addEventListener('click', () => {
+   resetMyBetsDisplay();
+   inProgressSection.style.display = 'block';
+   fetchAcceptedBets('in progress');
+ });
+
+ finishedTab.addEventListener('click', () => {
+   resetMyBetsDisplay();
+   finishedSection.style.display = 'block';
+   fetchAcceptedBets('finished');
+ });
+}
+
+// Utility function to hide all sections and reset tab displays
+function resetMyBetsDisplay() {
+  document.getElementById('my-upcoming-events-section').style.display = 'none';
+  document.getElementById('my-in-progress-events-section').style.display = 'none';
+  document.getElementById('my-finished-events-section').style.display = 'none';
+
+  // Optionally, remove the 'active' class from all tabs if you are visually indicating the active tab
+  document.querySelectorAll('.my-bets-sub-tab').forEach(tab => tab.classList.remove('active'));
+}
+
+async function fetchAcceptedBets(status, currentUser, userGroup) {
+  try {
+    // Construct the URL with a query parameter for status
+    const url = `/accepted-bets?status=${status}&currentUser=${currentUser}&userGroup=${userGroup}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.success) {
+      // Determine the sectionId based on the status
+      let sectionId = '';
+      switch (status) {
+        case 'upcoming':
+          sectionId = 'my-upcoming-events-section';
+          break;
+        case 'in progress':
+          sectionId = 'my-in-progress-events-section';
+          break;
+        case 'finished':
+          sectionId = 'my-finished-events-section';
+          break;
+        default:
+          console.error('Unknown status:', status);
+          return;
+      }
+      // Directly display the filtered bets
+      // displayAcceptedBets(data.acceptedBets, status);
+      displayAcceptedBets(data.acceptedBets, sectionId)
+    } else {
+      console.error('Failed to fetch bets');
+    }
+  } catch (error) {
+    console.error('Error fetching accepted bets:', error.message);
+  }
+}
+
+function displayAcceptedBets(bets, sectionId) {
+  const betsContainer = document.getElementById(sectionId);
+  if (!betsContainer) {
+    console.error(`Cannot find element with ID ${sectionId}`);
+    return;
+  }
+  betsContainer.innerHTML = ''; // Clear the container
+
+  bets.forEach(bet => {
+    const betCard = createBetCard(bet);
+    betsContainer.appendChild(betCard);
+  });
+}
 
 
+function createBetCard(bet) {
+  const card = document.createElement('div');
+  card.classList.add('bet-card');
+
+  const gameTime = document.createElement('div');
+  gameTime.textContent = `Game Time: ${new Date(bet.gameTime).toLocaleString()}`;
+  card.appendChild(gameTime);
+
+  const wagerAmount = document.createElement('div');
+  wagerAmount.textContent = `Wager Amount: $${bet.wagerAmount}`;
+  card.appendChild(wagerAmount);
+
+  const originalDetails = document.createElement('div');
+  originalDetails.innerHTML = `Original Taker: ${bet.firstUser}<br>Original Team: ${bet.originalPick}<br>Original Odds: ${bet.originalOdds}`;
+  card.appendChild(originalDetails);
+
+  const acceptedDetails = document.createElement('div');
+  acceptedDetails.innerHTML = `Accepted Bet: ${bet.betTaker}<br>Accepted Team: ${bet.acceptedPick}<br>Accepted Odds: ${bet.acceptedOdds}`;
+  card.appendChild(acceptedDetails);
+
+  return card;
+}
+
+async function fetchBet365Data(eventId) {
+  try {
+    const response = await fetch(`/bet365-data/${eventId}`);
+    if (response.ok) {
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching Bet365 data:', error);
+    return null;
+  }
+}
+
+
+
+// ----------------------------wagers---------------------------
 // wagers.js
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -204,59 +459,7 @@ function createDateTimeHeader(timestamp) {
   return header; // Return the created DOM node
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchSportsStats();
-  fetchUserRecords();
-  // Other initialization code
-});
 
-async function fetchSportsStats() {
-  try {
-    const response = await fetch('/sports-stats');
-    if (response.ok) {
-      const sportsStats = await response.json();
-      populateSportsStatsTable(sportsStats);
-    } else {
-      console.error('Failed to fetch sports stats:', response.statusText);
-    }
-  } catch (error) {
-    console.error('Error fetching sports stats:', error);
-  }
-}
-
-function populateSportsStatsTable(sportsStats) {
-  new Tabulator("#sports-stats-table", {
-    data: sportsStats,
-    columns: [
-      { title: "Sport", field: "leagueName" },
-      { title: "Wins", field: "wins" },
-      { title: "Losses", field: "losses" },
-      {
-        title: "Win %",
-        field: "winPct",
-        formatter: "progress",
-        formatterParams: {
-          min: 0,
-          max: 100,
-          color: ["red", "green"],
-          legend: (value) => value + '%'
-        },
-        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
-        sorterParams: {
-          format: { // Provide formatting options
-            decimal: ".", // Use dot as decimal separator
-            thousand: "", // Don't use thousand separator
-          },
-        },
-      }
-    ],
-    layout: "fitColumns",
-    tooltips: true,
-    initialSort: [ // Specify initial sorting by "Win %" column in descending order
-      { column: "winPct", dir: "desc" },
-    ],
-  });
-}
 
 
 
@@ -289,6 +492,7 @@ function handleTakeWager2(wager, currentUser, userGroup ) {
       eventId: wager.bet365Id,
       userGroup: userGroup,
       leagueName: wager.leagueName,
+      status: "upcoming",
       _id: wager._id
     }),
   })
@@ -382,25 +586,17 @@ function deleteWager(wager) {
     });
 }
 
-function displayMyBets() {
-  const myBetsContainer = document.getElementById('my-bets-container');
-  myBetsContainer.innerHTML = ''; // Clear existing content
-
-  acceptedBetsData.forEach(bet => {
-    // Create elements for each bet and append to myBetsContainer
-    const betDiv = document.createElement('div');
-    betDiv.classList.add('bet');
-
-    const details = `
-      <div class="bet-details">
-        <div><strong>Event:</strong> ${bet.event}</div>
-        <div><strong>Wager:</strong> $${bet.wagerAmount}</div>
-        <div><strong>Odds:</strong> ${bet.odds}</div>
-        <div><strong>Status:</strong> ${bet.status}</div>
-      </div>
-    `;
-
-    betDiv.innerHTML = details;
-    myBetsContainer.appendChild(betDiv);
-  });
+async function fetchBet365Data(eventId) {
+  try {
+    const response = await fetch(`/bet365-data/${eventId}`);
+    if (response.ok) {
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching Bet365 data:', error);
+    return null;
+  }
 }

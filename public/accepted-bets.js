@@ -333,7 +333,7 @@ function updateFinalScores(betCard, resultsData, bet, sportId) {
         break;
 
         case 12: // For sport_id 18
-          const scoreData12 = finalScores.scores[7]; // Specific to sportId 18
+          const scoreData12 = finalScores.scores[7]; // Specific to sportId 12
 
           originalPickScore = bet.originalPick === finalScores.away.name ? scoreData12.away : scoreData12.home;
           acceptedPickScore = bet.acceptedPick === finalScores.away.name ? scoreData12.away : scoreData12.home;

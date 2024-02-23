@@ -13,6 +13,7 @@ const bcrypt = require('bcrypt');
 const mongoUri = process.env.MONGO_URI;
 const { MongoClient, ObjectId } = require('mongodb');
 const mongoClient = new MongoClient(mongoUri);
+const cron = require('node-cron');
 
 // MongoDB connection
 async function connectToMongoDB() {
@@ -95,37 +96,38 @@ app.get('/signout', (req, res) => {
 app.post('/register', async (req, res) => {
     const { username, password, group, groupPassword } = req.body;
 
-    // console.log(groupPassword)
-
     try {
         const groupDoc = await groupsCollection.findOne({ group: group });
         if (!groupDoc) {
             return res.status(400).json({ success: false, message: 'Group not found.' });
         }
 
-        // Directly compare the submitted groupPassword with the stored hash
         const passwordMatch = await bcrypt.compare(groupPassword, groupDoc.password);
         if (!passwordMatch) {
             return res.status(400).json({ success: false, message: 'Incorrect group password.' });
         }
 
-        // If the group password matches, proceed with hashing the user's password and the rest of the registration process
-        const hash = await bcrypt.hash(password, 10); // Adjust the salt rounds if necessary
-        // Create the user document including the groupName
-        const newUser = { username, password: hash, group };
+        const hash = await bcrypt.hash(password, 10);
+        // Create the user document including the groupName, and initializing wins and losses to 0
+        const newUser = {
+            username,
+            password: hash,
+            group,
+            wins: 0, // Initialize wins to 0
+            losses: 0 // Initialize losses to 0
+        };
         console.log(newUser);
         await usersCollection.insertOne(newUser);
 
-        // Optionally, you can clear the session's groupPasswordHash if it was previously set in another operation
         req.session.groupPasswordHash = null;
 
-        // Registration successful, proceed with the response
         return res.json({ success: true, redirectUrl: '/login?registration=success' });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ success: false, message: 'Server error during registration.' });
     }
 });
+
 
 
 
@@ -170,10 +172,16 @@ app.post('/login', async (req, res, next) => {
       try {
         // Fetch group users and related data
         const userGroup = user.group;
-        const groupUsers = await usersCollection.find({ group: userGroup }, { projection: { username: 1, wins: 1, losses: 1, winPct: 1 } }).toArray();
+        const groupUsers = await usersCollection.find({ group: userGroup }, { projection: { username: 1, wins: 1, losses: 1 } }).toArray();
 
-        // Render the group page with necessary data
-        return res.render('group-page', { groupUsers: groupUsers, userGroup: userGroup, currentUser: username });
+        // Calculate win percentage for each user
+        const groupUsersWithWinPct = groupUsers.map(user => {
+          const winPct = calculateWinPercentage(user.wins, user.losses);
+          return { ...user, winPct: winPct }; // Add calculated winPct to each user
+        });
+
+        // Render the group page with necessary data including winPct
+        return res.render('group-page', { groupUsers: groupUsersWithWinPct, userGroup: userGroup, currentUser: username });
       } catch (error) {
         console.error('Error fetching group users:', error.message);
         return res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -183,6 +191,15 @@ app.post('/login', async (req, res, next) => {
     res.redirect('/login'); // Redirect back to login on failure
   }
 });
+
+function calculateWinPercentage(wins, losses) {
+  const totalGames = wins + losses;
+  // Calculate the win percentage as a fraction of 1, not 100
+  const winPct = totalGames > 0 ? (wins / totalGames) : 0;
+  // Multiply by 100 here to convert to a percentage, then format to 2 decimal places
+  return (winPct * 100).toFixed(2);
+}
+
 
 // Render games.ejs page
 app.get('/games', (req, res) => {
@@ -354,7 +371,9 @@ app.post('/remove-wager', express.json(), async (req, res) => {
 const savedBets = [];
 
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
-  const { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, leagueName } = req.body;
+  let { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, status, leagueName } = req.body;
+
+  gameTime = new Date(gameTime);
 
   const betData = {
     originalPick,
@@ -368,6 +387,7 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     sportId,
     eventId,
     userGroup,
+    status,
     leagueName,
     _id,
     // Include other relevant fields
@@ -391,15 +411,243 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 });
 
 // db get route
+// app.get('/accepted-bets', async (req, res) => {
+//   try {
+//     const acceptedBets = await acceptedBetsCollection.find({}).toArray();
+//     res.json({ success: true, acceptedBets });
+//   } catch (error) {
+//     console.error('Error fetching bets:', error.message);
+//     res.status(500).json({ success: false, error: 'Internal Server Error' });
+//   }
+// });
+
 app.get('/accepted-bets', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ success: false, message: 'Not authenticated' });
+  }
+
+  const currentUser = req.user.username; // Assuming username is stored in req.user
+  const userGroup = req.user.group; // Assuming group information is stored in req.user
+  const { status } = req.query; // Status can still be passed as a query parameter
+
   try {
-    const acceptedBets = await acceptedBetsCollection.find({}).toArray();
+    let query = {
+      $or: [{ firstUser: currentUser }, { betTaker: currentUser }], // Filter by current user involvement
+      userGroup: userGroup // Filter by user's group
+    };
+
+    console.log('server', status)
+
+    if (status) {
+      query.status = status; // Further filter by status if provided
+    }
+
+    const acceptedBets = await acceptedBetsCollection.find(query).toArray();
+    console.log(acceptedBets)
     res.json({ success: true, acceptedBets });
   } catch (error) {
-    console.error('Error fetching bets:', error.message);
+    console.error('Error fetching bets:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
+// Update bet statuses
+async function updateBetStatuses() {
+  const client = new MongoClient(process.env.MONGO_URI);
+  try {
+    await client.connect();
+    const db = client.db("Bets");
+    const collection = db.collection("acceptedBets");
+
+    // Current time in the appropriate format
+    const now = new Date();
+
+    // Update the status of bets where the game time has passed
+    const result = await collection.updateMany(
+      { gameTime: { $lt: now }, status: "upcoming" },
+      { $set: { status: "in progress" } }
+    );
+
+    console.log(`Updated ${result.modifiedCount} bet(s) to 'in progress'.`);
+  } catch (err) {
+    console.error('Failed to update bet statuses:', err);
+  } finally {
+    await client.close();
+  }
+}
+
+// Schedule the task to run every minute
+cron.schedule('* * * * *', updateBetStatuses);
+
+// Function to check the status of in-progress games and update them if finished
+async function updateBetStatusesToFinished() {
+  const inProgressBets = await fetchInProgressBets();
+
+  for (const bet of inProgressBets) {
+    try {
+      const results = await fetchBet365Results(bet.eventId);
+      const scores = await processGameResults(results, bet);
+
+      console.log('scores', scores)
+
+      if (results && isEventFinished(results)) {
+        bet.originalScore = scores.originalPickScore;
+        bet.acceptedScore = scores.acceptedPickScore;
+
+        const originalTotalScore = parseFloat(scores.originalPickScore) + parseFloat(bet.originalOdds);
+        const acceptedTotalScore = parseFloat(scores.acceptedPickScore);
+
+        let winner, loser;
+
+        if (originalTotalScore > acceptedTotalScore) {
+          bet.winner = bet.firstUser;
+          bet.loser = bet.betTaker;
+          winner = bet.firstUser;
+          loser = bet.betTaker;
+        } else if (originalTotalScore < acceptedTotalScore) {
+          bet.winner = bet.betTaker;
+          bet.loser = bet.firstUser;
+          winner = bet.betTaker;
+          loser = bet.firstUser;
+        }
+
+        if (winner && loser) {
+          await updateWinLossStats(winner, loser);
+        }
+
+        bet.status = 'finished';
+        await moveBetToFinished(bet);
+      }
+    } catch (err) {
+      console.error('Error updating bet status for bet ID:', bet._id, err);
+    }
+  }
+}
+
+async function updateWinLossStats(winnerUsername, loserUsername) {
+  // Increment wins for the winner
+  await usersCollection.updateOne(
+    { username: winnerUsername },
+    { $inc: { wins: 1 } }
+  );
+
+  // Increment losses for the loser
+  await usersCollection.updateOne(
+    { username: loserUsername },
+    { $inc: { losses: 1 } }
+  );
+}
+
+// Schedule the task to run at a regular interval, e.g., every 5 minutes
+cron.schedule('*/1 * * * *', updateBetStatusesToFinished);
+
+// Function to fetch in-progress bets
+async function fetchInProgressBets() {
+  const client = new MongoClient(mongoUri);
+
+  try {
+    await client.connect();
+    const db = client.db('Bets');
+    const collection = db.collection('acceptedBets');
+
+    // Query for bets with status 'in progress'
+    const query = { status: 'in progress' };
+    const bets = await collection.find(query).toArray();
+
+    return bets;
+  } catch (err) {
+    console.error('Failed to fetch in-progress bets:', err);
+  } finally {
+    await client.close();
+  }
+}
+
+async function processGameResults(results, bet) {
+  const resultsData = await fetchBet365Results(bet.eventId);
+
+  let originalPickScore = '';
+  let acceptedPickScore = '';
+
+  if (resultsData && resultsData.results[0]) {
+    const finalScores = resultsData.results[0];
+    const sportId = finalScores.sport_id; // Assuming sport_id is available in finalScores
+
+    switch(sportId) {
+      case '17': // Assuming 17 is for a specific sport
+        const scoreData17 = finalScores.scores[5]; // Specific to sportId 17
+        originalPickScore = bet.originalPick === finalScores.away.name ? scoreData17.away : scoreData17.home;
+        acceptedPickScore = bet.acceptedPick === finalScores.away.name ? scoreData17.away : scoreData17.home;
+        break;
+
+      case '18': // For sport_id 18
+        const scoreData18 = finalScores.scores[7]; // Specific to sportId 18
+        originalPickScore = bet.originalPick === finalScores.away.name ? scoreData18.away : scoreData18.home;
+        acceptedPickScore = bet.acceptedPick === finalScores.away.name ? scoreData18.away : scoreData18.home;
+        break;
+
+      case '12': // For sport_id 12
+        const scoreData12 = finalScores.scores[7]; // Specific to sportId 12
+        originalPickScore = bet.originalPick === finalScores.away.name ? scoreData12.away : scoreData12.home;
+        acceptedPickScore = bet.acceptedPick === finalScores.away.name ? scoreData12.away : scoreData12.home;
+        break;
+      }
+
+        return {
+         originalPickScore: originalPickScore,
+         acceptedPickScore: acceptedPickScore
+       };
+     }
+
+     // Return empty scores if no results are found or in case of error
+     return {
+       originalPickScore: '',
+       acceptedPickScore: ''
+     };
+   }
+
+
+async function fetchBet365Results(eventId) {
+  const apiUrl = `https://api.b365api.com/v1/bet365/result?token=${apiKey}&event_id=${eventId}`;
+
+  try {
+    const response = await axios.get(apiUrl);
+    return response.data; // axios automatically parses the JSON response
+  } catch (error) {
+    // Handle errors that occur during the API call
+    console.error('Failed to fetch results:', error.message);
+    throw new Error('Failed to fetch results');
+  }
+}
+
+function isEventFinished(results) {
+  return(results.results[0].time_status === '3')
+}
+
+async function moveBetToFinished(bet) {
+  const client = new MongoClient(mongoUri);
+
+  try {
+    await client.connect();
+    const db = client.db('Bets');
+    // Correct the collection name to 'finishedBets' and fix the typo
+    const finishedBetsCollection = db.collection('finishedBets');
+    const insertResult = await finishedBetsCollection.insertOne(bet);
+    console.log(`Bet ID ${bet._id} moved to 'finishedBets'. Insert Result:`, insertResult);
+
+    // If the insert was successful, remove the bet from 'acceptedBets'
+    if (insertResult.acknowledged) {
+      const acceptedBetsCollection = db.collection('acceptedBets');
+      const deleteResult = await acceptedBetsCollection.deleteOne({ _id: bet._id });
+      console.log(`Bet ID ${bet._id} removed from 'acceptedBets'. Delete Result:`, deleteResult);
+    }
+  } catch (err) {
+    console.error('Failed to move bet to finished:', err);
+  } finally {
+    await client.close();
+  }
+}
+
+
 
 app.get('/mybets', async (req, res) => {
   // Check if the user is authenticated
@@ -473,88 +721,86 @@ app.get('/bet365-results/:eventId', async (req, res) => {
   }
 });
 
-app.post('/save-finished-event', async (req, res) => {
-    const eventData = req.body;
-    const { originalTeamScore, acceptedTeamScore, originalOdds, acceptedOdds, originalUser, secondUser, wagerAmount, acceptedPick, originalPick, eventTime, _id, sportId, leagueName } = eventData;
+// app.post('/save-finished-event', async (req, res) => {
+//     const eventData = req.body;
+//     const { originalTeamScore, acceptedTeamScore, originalOdds, acceptedOdds, originalUser, secondUser, wagerAmount, acceptedPick, originalPick, eventTime, _id, sportId, leagueName } = eventData;
+//
+//     try {
+//         // Check if an event with the same _id already exists in finishedBets
+//         const existingEvent = await finishedBetsCollection.findOne({ _id: _id });
+//
+//         if (existingEvent) {
+//             res.json({ success: false, message: 'Event already exists in finished bets' });
+//             return;
+//         }
+//
+//         const scoreWithOdds = (originalTeamScore + originalOdds);
+//
+//         if (scoreWithOdds > acceptedTeamScore) {
+//             eventData.winner = originalUser;
+//             eventData.loser = secondUser;
+//             eventData.winningTeam = originalPick;
+//             eventData.losingTeam = acceptedPick;
+//             eventData.winningScore = originalTeamScore;
+//             eventData.losingScore = acceptedTeamScore;
+//             eventData.winningOdds = originalOdds;
+//             eventData.losingOdds = acceptedOdds;
+//         } else if (scoreWithOdds < acceptedTeamScore) {
+//             eventData.winner = secondUser;
+//             eventData.loser = originalUser;
+//             eventData.winningTeam = acceptedPick;
+//             eventData.losingTeam = originalPick;
+//             eventData.winningScore = acceptedTeamScore;
+//             eventData.losingScore = originalTeamScore;
+//             eventData.winningOdds = acceptedOdds;
+//             eventData.losingOdds = originalOdds;
+//         }
+//
+//         // Update wins and losses for winner and loser
+//         await updateWinLoss(eventData.winner, true, wagerAmount); // true for a win
+//         await updateWinLoss(eventData.loser, false, wagerAmount); // false for a loss
+//
+//         // Save the event data to the finishedBets collection
+//         await finishedBetsCollection.insertOne(eventData);
+//
+//         // Remove the event from the acceptedBets collection
+//         const result = await acceptedBetsCollection.deleteOne({ _id: _id });
+//
+//         if (result.deletedCount === 1) {
+//             res.json({ success: true, message: 'Event moved to finished bets successfully' });
+//         } else {
+//             throw new Error('Event not found in accepted bets');
+//         }
+//     } catch (error) {
+//         console.error('Error moving event to finished bets:', error);
+//         res.status(500).send('Error moving event to finished bets');
+//     }
+// });
 
-    console.log('leagueName', leagueName)
-
-    try {
-        // Check if an event with the same _id already exists in finishedBets
-        const existingEvent = await finishedBetsCollection.findOne({ _id: _id });
-
-        if (existingEvent) {
-            res.json({ success: false, message: 'Event already exists in finished bets' });
-            return;
-        }
-
-        const scoreWithOdds = (originalTeamScore + originalOdds);
-
-        if (scoreWithOdds > acceptedTeamScore) {
-            eventData.winner = originalUser;
-            eventData.loser = secondUser;
-            eventData.winningTeam = originalPick;
-            eventData.losingTeam = acceptedPick;
-            eventData.winningScore = originalTeamScore;
-            eventData.losingScore = acceptedTeamScore;
-            eventData.winningOdds = originalOdds;
-            eventData.losingOdds = acceptedOdds;
-        } else if (scoreWithOdds < acceptedTeamScore) {
-            eventData.winner = secondUser;
-            eventData.loser = originalUser;
-            eventData.winningTeam = acceptedPick;
-            eventData.losingTeam = originalPick;
-            eventData.winningScore = acceptedTeamScore;
-            eventData.losingScore = originalTeamScore;
-            eventData.winningOdds = acceptedOdds;
-            eventData.losingOdds = originalOdds;
-        }
-
-        // Update wins and losses for winner and loser
-        await updateWinLoss(eventData.winner, true, wagerAmount); // true for a win
-        await updateWinLoss(eventData.loser, false, wagerAmount); // false for a loss
-
-        // Save the event data to the finishedBets collection
-        await finishedBetsCollection.insertOne(eventData);
-
-        // Remove the event from the acceptedBets collection
-        const result = await acceptedBetsCollection.deleteOne({ _id: _id });
-
-        if (result.deletedCount === 1) {
-            res.json({ success: true, message: 'Event moved to finished bets successfully' });
-        } else {
-            throw new Error('Event not found in accepted bets');
-        }
-    } catch (error) {
-        console.error('Error moving event to finished bets:', error);
-        res.status(500).send('Error moving event to finished bets');
-    }
-});
-
-async function updateWinLoss(username, isWin, wagerAmount) {
-    const user = await usersCollection.findOne({ username: username });
-    if (!user) return;
-
-    let { wins, losses, winnings = 0 } = user; // Initialize winnings if not present
-
-    if (isWin) {
-        wins += 1;
-        winnings += wagerAmount; // Increment winnings for a win
-    } else {
-        losses += 1;
-        winnings -= wagerAmount; // Decrement winnings for a loss
-    }
-
-    const winPct = (wins + losses) > 0 ? wins / (wins + losses) : 0;
-
-    await usersCollection.updateOne(
-        { username: username },
-        {
-          $set: { wins: wins, losses: losses, winPct: winPct, winnings: winnings },
-          $inc: { totalRisked: wagerAmount } // Increment totalRisked
-        }
-    );
-}
+// async function updateWinLoss(username, isWin, wagerAmount) {
+//     const user = await usersCollection.findOne({ username: username });
+//     if (!user) return;
+//
+//     let { wins, losses, winnings = 0 } = user; // Initialize winnings if not present
+//
+//     if (isWin) {
+//         wins += 1;
+//         winnings += wagerAmount; // Increment winnings for a win
+//     } else {
+//         losses += 1;
+//         winnings -= wagerAmount; // Decrement winnings for a loss
+//     }
+//
+//     const winPct = (wins + losses) > 0 ? wins / (wins + losses) : 0;
+//
+//     await usersCollection.updateOne(
+//         { username: username },
+//         {
+//           $set: { wins: wins, losses: losses, winPct: winPct, winnings: winnings },
+//           $inc: { totalRisked: wagerAmount } // Increment totalRisked
+//         }
+//     );
+// }
 
 // db route for finished events
 app.get('/saved-events', async (req, res) => {
@@ -631,10 +877,19 @@ app.get('/mygroup', async (req, res) => {
       // Fetch all users in the same group along with their stats
       const groupUsers = await usersCollection.find({ group: userGroup }, { projection: { username: 1, wins: 1, losses: 1, winPct: 1 } }).toArray();
 
+      // Calculate win percentage for each user
+      const groupUsersWithWinPct = groupUsers.map(user => {
+      const winPct = calculateWinPercentage(user.wins, user.losses);
+      console.log('win pct', winPct)
+      return { ...user, winPct }; // Add winPct property to each user object
+    });
+
+    console.log('groupUsersWithWinPct', groupUsersWithWinPct);
+
       const currentUser = req.user.username;
 
       // Render the group page with the list of users
-      res.render('group-page', { groupUsers: groupUsers, userGroup: userGroup, currentUser: currentUser });
+      res.render('group-page', { groupUsers: groupUsersWithWinPct, userGroup: userGroup, currentUser: currentUser });
     } catch (error) {
       console.error('Error fetching group users:', error.message);
       res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -651,14 +906,18 @@ app.get('/sports-stats', async (req, res) => {
 
   const currentUser = req.user.username;
 
+  console.log(currentUser);
+
   try {
     // Fetch finished bets directly from the finishedBetsCollection
     const finishedBets = await finishedBetsCollection.find({
       $or: [
-        { originalUser: currentUser },
-        { secondUser: currentUser }
+        { firstUser: currentUser },
+        { betTaker: currentUser }
       ]
     }).toArray();
+
+    console.log('finished bets', finishedBets)
 
     // Process the finished bets to calculate sports stats
     const statsBySport = calculateSportsStats(finishedBets, currentUser);
@@ -673,6 +932,7 @@ function calculateSportsStats(finishedBets, currentUser) {
   const statsByLeague = {};
 
   finishedBets.forEach(bet => {
+    console.log(bet.leagueName);
     // Initialize the league stats if not already done
     if (!statsByLeague[bet.leagueName]) {
       statsByLeague[bet.leagueName] = { wins: 0, losses: 0, leagueName: bet.leagueName };

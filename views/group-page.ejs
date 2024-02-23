@@ -34,36 +34,60 @@
         <li><a href="/mygroup">My Group</a></li>
         <li><a href="/mybets">My Bets</a></li>
         <li><a href="/my-stats">My Stats</a></li>
+        <li><a href="/signout">Sign Out</a></li>
       </ul>
     </div>
   </nav>
 
+  <!-- group-page.ejs -->
   <div class="tabs">
-    <button class="tablinks active" onclick="openTab(event, 'Leaderboard')">Leaderboard</button>
-    <button class="tablinks" onclick="openTab(event, 'Stats')">Stats</button>
-    <button class="tablinks" onclick="openTab(event, 'Wagers')">Open Bets</button>
+    <button class="tablinks" id="statsTab">Stats</button>
+    <button class="tablinks" id="wagersTab">Open Bets</button>
+    <button class="tablinks" id="myBetsTab">My Bets</button>
+    <button class="tablinks" id="myBetsTab">Create Bet</button>
   </div>
 
-  <!-- Leaderboard Tab Content -->
- <div id="Leaderboard" class="tabcontent default-open">
+ <!-- Stats Tab Content now includes Leaderboard and Stats -->
+ <div id="stats" class="tabcontent default-open">
+   <!-- Leaderboard Section moved here -->
    <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Scoreboard</h3>
    <div id="group-table"></div>
- </div>
+
+   <h3 style="text-align:left; margin-top:20px;">Stats by Sport</h3>
+   <div id="sports-stats-table"></div>
+
+   <h3 style="text-align:left; margin-top:20px;">Record vs Others</h3>
+   <div id="user-records-table"></div>
+</div>
 
  <!-- Stats Tab Content -->
- <div id="Stats" class="tabcontent">
-     <h3 style="text-align:left; margin-top:20px;">Stats by Sport</h3>
-     <div id="sports-stats-table"></div>
-
-     <h3 style="text-align:left; margin-top:20px;">Record vs Others</h3>
-     <div id="user-records-table"></div> <!-- Add a container for user records -->
- </div>
-
- <!-- Stats Tab Content -->
-  <div id="Wagers" class="tabcontent">
+  <div id="wagers" class="tabcontent">
     <h3 style="text-align:left; margin-top:20px;"><%= userGroup %> Open Bets</h3>
-    <div id="wagers-container" class="wagers-container">
+    <div id="wagers-container" class="wagers-container"></div>
   </div>
+
+  <div id="myBets" class="tabcontent">
+
+  <!-- Sub-tabs for My Bets -->
+  <div class="my-bets-tabs">
+    <button class="sub-tablinks" id="my-bets-tab-upcoming" onclick="openSubTab('my-upcoming-events-section')">Upcoming Bets</button>
+    <button class="sub-tablinks" id="my-bets-tab-inprogress" onclick="openSubTab('my-in-progress-events-section')">In Progress Bets</button>
+    <button class="sub-tablinks" id="my-bets-tab-finished" onclick="openSubTab('my-finished-events-section')">Finished Bets</button>
+  </div>
+
+  <div id="my-upcoming-events-section" class="bets-section sub-tabcontent">
+    <!-- <h4>Upcoming Bets</h4> -->
+    <!-- Upcoming bets will be displayed here -->
+  </div>
+  <div id="my-in-progress-events-section" class="bets-section sub-tabcontent" style="display:none;">
+    <!-- <h4>In Progress Bets</h4> -->
+    <!-- In-progress bets will be displayed here -->
+  </div>
+  <div id="my-finished-events-section" class="bets-section sub-tabcontent" style="display:none;">
+    <!-- <h4>Finished Bets</h4> -->
+    <!-- Finished bets will be displayed here -->
+  </div>
+</div>
 
   <!-- You can add more content or styling as needed -->
 <script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->
@@ -72,25 +96,9 @@
 <script>
   var currentUser = "<%= currentUser %>";
   var userGroup = "<%= userGroup %>";
-  var groupUsersData = <%- JSON.stringify(groupUsers) %>; // Pass the EJS data to a JavaScript variable
+  var groupUsersData = <%- JSON.stringify(groupUsers) %>; // Use the corrected variable name
 </script>
 <script src="group.js"></script> <!-- Link to your custom JS file -->
-
-<script>
-   function openTab(evt, tabName) {
-     var i, tabcontent, tablinks;
-     tabcontent = document.getElementsByClassName("tabcontent");
-     for (i = 0; i < tabcontent.length; i++) {
-       tabcontent[i].style.display = "none";
-     }
-     tablinks = document.getElementsByClassName("tablinks");
-     for (i = 0; i < tablinks.length; i++) {
-       tablinks[i].className = tablinks[i].className.replace(" active", "");
-     }
-     document.getElementById(tabName).style.display = "block";
-     evt.currentTarget.className += " active";
-   }
- </script>
 
 <a href="/games" class="floating-button">+</a>
 
