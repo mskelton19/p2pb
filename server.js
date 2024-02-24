@@ -116,7 +116,6 @@ app.post('/register', async (req, res) => {
             wins: 0, // Initialize wins to 0
             losses: 0 // Initialize losses to 0
         };
-        console.log(newUser);
         await usersCollection.insertOne(newUser);
 
         req.session.groupPasswordHash = null;
@@ -204,7 +203,6 @@ function calculateWinPercentage(wins, losses) {
 // Render games.ejs page
 app.get('/games', (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.user);
     res.render('games', { user: req.user });
   } else {
     res.redirect('/login');
@@ -279,8 +277,6 @@ const wagers = [];
 // Placing a wager
 app.post('/place-wager', express.json(), async (req, res) => {
   const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName } = req.body;
-
-  console.log('group', group);
 
   const wagerId = uuidv4();
 
@@ -397,7 +393,6 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     await acceptedBetsCollection.insertOne(betData);
 
     // Remove the wager from the wagers collection using wagerId
-  console.log('wagerId', _id);
   const removeResult = await wagersCollection.deleteOne({ _id: _id });
   if (removeResult.deletedCount === 0) {
     throw new Error('Wager not found or already removed');
@@ -436,14 +431,11 @@ app.get('/accepted-bets', async (req, res) => {
       userGroup: userGroup // Filter by user's group
     };
 
-    console.log('server', status)
-
     if (status) {
       query.status = status; // Further filter by status if provided
     }
 
     const acceptedBets = await acceptedBetsCollection.find(query).toArray();
-    console.log(acceptedBets)
     res.json({ success: true, acceptedBets });
   } catch (error) {
     console.error('Error fetching bets:', error);
@@ -823,10 +815,11 @@ app.get('/finished-bets', async (req, res) => {
   try {
     const finishedBets = await finishedBetsCollection.find({
       $or: [
-        { originalUser: currentUser },
-        { secondUser: currentUser }
+        { firstUser: currentUser },
+        { betTaker: currentUser }
       ]
     }).toArray();
+
     res.json({ success: true, finishedBets });
   } catch (error) {
     console.error('Error fetching finished bets:', error);
@@ -880,11 +873,8 @@ app.get('/mygroup', async (req, res) => {
       // Calculate win percentage for each user
       const groupUsersWithWinPct = groupUsers.map(user => {
       const winPct = calculateWinPercentage(user.wins, user.losses);
-      console.log('win pct', winPct)
       return { ...user, winPct }; // Add winPct property to each user object
     });
-
-    console.log('groupUsersWithWinPct', groupUsersWithWinPct);
 
       const currentUser = req.user.username;
 
@@ -906,8 +896,6 @@ app.get('/sports-stats', async (req, res) => {
 
   const currentUser = req.user.username;
 
-  console.log(currentUser);
-
   try {
     // Fetch finished bets directly from the finishedBetsCollection
     const finishedBets = await finishedBetsCollection.find({
@@ -916,8 +904,6 @@ app.get('/sports-stats', async (req, res) => {
         { betTaker: currentUser }
       ]
     }).toArray();
-
-    console.log('finished bets', finishedBets)
 
     // Process the finished bets to calculate sports stats
     const statsBySport = calculateSportsStats(finishedBets, currentUser);
@@ -932,7 +918,6 @@ function calculateSportsStats(finishedBets, currentUser) {
   const statsByLeague = {};
 
   finishedBets.forEach(bet => {
-    console.log(bet.leagueName);
     // Initialize the league stats if not already done
     if (!statsByLeague[bet.leagueName]) {
       statsByLeague[bet.leagueName] = { wins: 0, losses: 0, leagueName: bet.leagueName };

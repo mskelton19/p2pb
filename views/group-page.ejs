@@ -44,7 +44,7 @@
     <button class="tablinks" id="statsTab">Stats</button>
     <button class="tablinks" id="wagersTab">Open Bets</button>
     <button class="tablinks" id="myBetsTab">My Bets</button>
-    <button class="tablinks" id="myBetsTab">Create Bet</button>
+    <button class="tablinks" id="createBetTab">Create Bet</button>
   </div>
 
  <!-- Stats Tab Content now includes Leaderboard and Stats -->
@@ -76,18 +76,52 @@
   </div>
 
   <div id="my-upcoming-events-section" class="bets-section sub-tabcontent">
-    <!-- <h4>Upcoming Bets</h4> -->
-    <!-- Upcoming bets will be displayed here -->
+
   </div>
   <div id="my-in-progress-events-section" class="bets-section sub-tabcontent" style="display:none;">
-    <!-- <h4>In Progress Bets</h4> -->
-    <!-- In-progress bets will be displayed here -->
+
   </div>
   <div id="my-finished-events-section" class="bets-section sub-tabcontent" style="display:none;">
-    <!-- <h4>Finished Bets</h4> -->
-    <!-- Finished bets will be displayed here -->
+
   </div>
 </div>
+
+<!-- Inside the Create Bet tab content -->
+<div id="createBet" class="tabcontent">
+  <!-- Sport icons container, adapted from games.ejs -->
+  <div id="createBet-sports-icons-container" class="sports-icons-container">
+    <div class="createBet-sport-icon" data-sportid="18" data-leagueid="10042997">🏀 NCAAB</div>
+    <div class="createBet-sport-icon" data-sportid="17" data-leagueid="10037477">🏒 NHL</div>
+    <div class="createBet-sport-icon" data-sportid="12" data-leagueid="10037219">🏈 NFL</div>
+    <div class="createBet-sport-icon" data-sportid="18" data-leagueid="10041830">🏀 NBA</div>
+  </div>
+
+  <!-- Container for the events will go here -->
+  <div id="createBet-events-container" class="events-container"></div>
+
+  <!-- Include other necessary elements like the drawer here -->
+</div>
+
+<!-- Update the drawer HTML for team name and odds on the same line -->
+<div id="drawer-container">
+  <div id="drawer" class="drawer">
+    <div class="drawer-nav">
+      <!-- Updated close button -->
+      <div class="close-button" onclick="hideDrawer()">x</div>
+    </div>
+    <!-- <div class="drawer-header">
+      <p id="drawerEventTime" class="drawer-event-time"></p>
+    </div> -->
+    <div class="drawer-content">
+  <div class="drawer-info">
+    <p id="drawerTeamName" class="drawer-team-name"></p>
+    <p id="drawerOdds" class="drawer-odds"></p>
+  </div>
+  <input type="text" id="wagerInput" placeholder="Enter wager">
+  <button id="confirmButton" onclick="confirmWager(teamNames, eventTime)">Place Bet</button>
+</div>
+
+
 
   <!-- You can add more content or styling as needed -->
 <script src="navbar.js"></script> <!-- JavaScript for navbar functionality -->

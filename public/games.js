@@ -47,7 +47,6 @@ function processQueue() {
     });
 }
 
-
 var userData;
 
 async function fetchEvents(sportId, leagueId) {
