@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 let isFetching = false;
+let inProgressBetsGlobal = [];
 
 // -------------------------group page tabs-------------------------------
 
@@ -42,7 +43,6 @@ function openTab(tabName) {
   }
 
   var tabButton = document.getElementById(tabName + 'Tab');
-  console.log(tabName);
   if (tabButton) {
     tabButton.classList.add("active");
   } else {
@@ -58,6 +58,10 @@ function openTab(tabName) {
        } else {
            floatingActionButton.style.display = 'block';
        }
+   }
+
+   if(tabName === 'stats') {
+
    }
 
   if (tabName === 'wagers') {
@@ -110,8 +114,6 @@ async function fetchEventsForCreateBet(sportId, leagueId) {
 
         const response = await fetch(url);
         const rawData = await response.json();
-
-        console.log('rawaData', rawData)
 
         const eventsData = Array.isArray(rawData) ? rawData : [rawData];
         for (const event of eventsData[0].results) {
@@ -243,7 +245,6 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName
     oddsCard.dataset.eventId = eventId;
 
     oddsCard.addEventListener('click', () => {
-      console.log('odds card clicked')
         if (selectedOddsCard) {
             selectedOddsCard.classList.remove('selected');
         }
@@ -259,10 +260,50 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName
         const awayTeamName = eventCard.dataset.awayTeam;
 
         // Call a function to open the drawer
+        console.log('show drawer call')
         showDrawer(homeTeamName, awayTeamName, teamName, formattedOdds, eventTime, leagueName);
     });
 
     return oddsCard;
+}
+
+async function fetchAndUpdateLiveScores() {
+    try {
+        await fetchAcceptedBets('in progress', currentUser, userGroup); // Fetch in-progress bets first
+        console.log('in progress bets 2', inProgressBetsGlobal)
+        const response = await fetch('/live-scores');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const { liveScores } = await response.json();
+        console.log("Received live scores:", liveScores); // Log to inspect the structure
+        updateScoresOnUI(liveScores);
+    } catch (error) {
+        console.error('Error fetching live scores:', error);
+    }
+}
+
+
+function updateScoresOnUI(liveScores) {
+    // Assume inProgressBets is an array of bets currently displayed on the UI
+    inProgressBetsGlobal.forEach(bet => {
+        if (liveScores[bet.eventId]) {
+            // We found live scores for this event
+            const { scores } = liveScores[bet.eventId];
+            // Update the UI for this bet with the live scores
+            updateBetUI(bet, scores);
+        }
+    });
+}
+
+function updateBetUI(bet, scores) {
+    // Find the UI element for this bet
+    const betElement = document.querySelector(`#bet-${bet._id}`); // Assuming each bet has a unique element ID
+    if (betElement) {
+        // Update the element with new scores. This depends on your HTML structure.
+        const scoresElement = betElement.querySelector('.scores');
+        scoresElement.textContent = `Scores: ${scores.originalPickScore} - ${scores.acceptedPickScore}`;
+    }
 }
 
 
@@ -270,7 +311,6 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime, leagueNam
   const drawer = document.getElementById('drawer');
 
   const formattedOdds = odds > 0 ? `${odds}` : odds;
-  console.log(formattedOdds);
 
   // document.getElementById('drawerTeamNames').textContent = `${awayTeamName} vs ${homeTeamName}`;
   document.getElementById('drawerTeamName').textContent = `${pick}`;
@@ -315,9 +355,6 @@ function hideDrawer() {
 // Add this function to handle confirming the wager
 function confirmWager2(teamNames, eventTime, username, leagueName, group) {
 
-  // console.log(group)
-  console.log(group)
-
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
   // Pass along taken odds
@@ -355,7 +392,6 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
     })
       .then(response => response.json())
       .then(data => {
-        console.log('Wager placed:', data.wager);
         hideDrawer();
         showToast('Wager placed successfully!');
         // Handle success or show a confirmation message to the user
@@ -407,8 +443,6 @@ function openSubTab(subTabName) {
 // ------------------------Stats Tab----------------------------------------
 function setupGroupPage(){
 
-  console.log(groupUsersData);
-
   var table = new Tabulator("#group-table", {
     data: groupUsersData,
     columns: [
@@ -419,14 +453,19 @@ function setupGroupPage(){
         title: "Win %",
         field: "winPct",
         formatter: function(cell, formatterParams) {
-            var value = cell.getValue();
-            return value ? value + '%' : "0%"; // Directly append '%' to the value
-          },
-        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+          var value = cell.getValue();
+          // Check if value is above 50% and apply color styling
+          if (value > 50) {
+            return "<div style='color: green;'>" + value + "%</div>"; // Green for above 50%
+          } else {
+            return "<div style='color: red;'>" + value + "%</div>"; // Red for below 50%
+          }
+        },
+        sorter: "number",
         sorterParams: {
-          format: { // Provide formatting options
-            decimal: ".", // Use dot as decimal separator
-            thousand: "", // Don't use thousand separator
+          format: {
+            decimal: ".",
+            thousand: "",
           },
         },
       }
@@ -439,19 +478,18 @@ function setupGroupPage(){
     addRowPos: "top",
     history: true,
     movableColumns: true,
-    initialSort: [ // Specify initial sorting by "Win %" column in descending order
+    initialSort: [
       { column: "winPct", dir: "desc" },
     ],
-  })
-};
+  });
 
+}
 
 async function fetchSportsStats() {
   try {
     const response = await fetch('/sports-stats');
     if (response.ok) {
       const sportsStats = await response.json();
-      console.log('sports stats', sportsStats);
       populateSportsStatsTable(sportsStats);
     } else {
       console.error('Failed to fetch sports stats:', response.statusText);
@@ -471,33 +509,46 @@ function populateSportsStatsTable(sportsStats) {
       {
         title: "Win %",
         field: "winPct",
-        formatter: "progress",
-        formatterParams: {
-          min: 0,
-          max: 100,
-          color: ["red", "green"],
-          legend: (value) => value + '%'
+        formatter: function(cell, formatterParams) {
+          var value = cell.getValue();
+          var element = document.createElement("div");
+
+          // Determine the color based on the value
+          var color = value >= 50 ? "green" : "red";
+          element.style.color = color;
+
+          // Set the text to display the value with a '%' sign
+          element.innerHTML = value + '%';
+
+          return element;
         },
-        sorter: "number", // Specify the sorter as "number" to ensure correct sorting
+        sorter: "number",
         sorterParams: {
-          format: { // Provide formatting options
-            decimal: ".", // Use dot as decimal separator
-            thousand: "", // Don't use thousand separator
+          format: {
+            decimal: ".",
+            thousand: "",
           },
         },
       }
     ],
     layout: "fitColumns",
     tooltips: true,
-    initialSort: [ // Specify initial sorting by "Win %" column in descending order
+    initialSort: [
       { column: "winPct", dir: "desc" },
     ],
   });
 }
 
+
 // ----------------------My Bets----------------------------------------
 
 function setupMyBetsTabs() {
+
+  document.getElementById('my-upcoming-events-section').classList.add('bets-section');
+  document.getElementById('my-in-progress-events-section').classList.add('bets-section');
+  document.getElementById('my-finished-events-section').classList.add('bets-section');
+
+  let liveScoresInterval;
   // Assuming you have similar buttons or links acting as tabs within your "My Bets" tab
   const upcomingTab = document.getElementById('my-bets-tab-upcoming');
   const inProgressTab = document.getElementById('my-bets-tab-inprogress');
@@ -519,6 +570,9 @@ function setupMyBetsTabs() {
  });
 
  inProgressTab.addEventListener('click', () => {
+   clearInterval(liveScoresInterval);
+   fetchAndUpdateLiveScores();
+   liveScoresInterval = setInterval(fetchAndUpdateLiveScores, 30000)
    resetMyBetsDisplay();
    inProgressSection.style.display = 'block';
    fetchAcceptedBets('in progress', currentUser, userGroup);
@@ -542,14 +596,13 @@ function resetMyBetsDisplay() {
 }
 
 async function fetchAcceptedBets(status, currentUser, userGroup) {
+  console.log('status', status)
   try {
-    // Construct the URL with a query parameter for status
     const url = `/accepted-bets?status=${status}&currentUser=${currentUser}&userGroup=${userGroup}`;
     const response = await fetch(url);
     const data = await response.json();
 
     if (data.success) {
-      // Determine the sectionId based on the status
       let sectionId = '';
       switch (status) {
         case 'upcoming':
@@ -557,6 +610,8 @@ async function fetchAcceptedBets(status, currentUser, userGroup) {
           break;
         case 'in progress':
           sectionId = 'my-in-progress-events-section';
+          // Update global variable for in-progress bets
+          inProgressBetsGlobal = data.acceptedBets; // Update the global variable
           break;
         case 'finished':
           sectionId = 'my-finished-events-section';
@@ -565,9 +620,7 @@ async function fetchAcceptedBets(status, currentUser, userGroup) {
           console.error('Unknown status:', status);
           return;
       }
-      // Directly display the filtered bets
-      // displayAcceptedBets(data.acceptedBets, status);
-      displayAcceptedBets(data.acceptedBets, sectionId)
+      displayAcceptedBets(data.acceptedBets, sectionId);
     } else {
       console.error('Failed to fetch bets');
     }
@@ -576,14 +629,12 @@ async function fetchAcceptedBets(status, currentUser, userGroup) {
   }
 }
 
+
 async function fetchFinishedBets() {
-  console.log('in finished bets')
 
   try {
     const response = await fetch('/finished-bets');
     const data = await response.json();
-
-    console.log(data);
 
     if (data.success) {
       // Assuming 'my-finished-events-section' is the ID of the container for finished bets
@@ -612,29 +663,47 @@ function displayAcceptedBets(bets, sectionId) {
   });
 }
 
-
 function createBetCard(bet) {
   const card = document.createElement('div');
   card.classList.add('bet-card');
 
+  // Game time
   const gameTime = document.createElement('div');
-  gameTime.textContent = `Game Time: ${new Date(bet.gameTime).toLocaleString()}`;
+  gameTime.classList.add('game-time');
+  gameTime.textContent = `${new Date(bet.gameTime).toLocaleString()}`;
   card.appendChild(gameTime);
 
+  // Wager amount
   const wagerAmount = document.createElement('div');
-  wagerAmount.textContent = `Wager Amount: $${bet.wagerAmount}`;
+  wagerAmount.classList.add('wager-amount');
+  wagerAmount.textContent = `$${bet.wagerAmount}`;
   card.appendChild(wagerAmount);
 
-  const originalDetails = document.createElement('div');
-  originalDetails.innerHTML = `Original Taker: ${bet.firstUser}<br>Original Team: ${bet.originalPick}<br>Original Odds: ${bet.originalOdds}`;
-  card.appendChild(originalDetails);
+  // Container for original and accepted details
+  const detailsContainer = document.createElement('div');
+  detailsContainer.classList.add('details-container');
 
+  // Original bet details
+  const originalDetails = document.createElement('div');
+  originalDetails.classList.add('original-details');
+  let originalScoresText = bet.liveScores ? `<div class="bet-scores">${bet.liveScores.originalPickScore}</div>` : '';
+  originalDetails.innerHTML = `${originalScoresText}<div>${bet.originalPick}<br>${bet.originalOdds}<br><br>${bet.firstUser}</div>`;
+  detailsContainer.appendChild(originalDetails);
+
+  // Accepted bet details
   const acceptedDetails = document.createElement('div');
-  acceptedDetails.innerHTML = `Accepted Bet: ${bet.betTaker}<br>Accepted Team: ${bet.acceptedPick}<br>Accepted Odds: ${bet.acceptedOdds}`;
-  card.appendChild(acceptedDetails);
+  acceptedDetails.classList.add('accepted-details');
+  let acceptedScoresText = bet.liveScores ? `<div class="bet-scores">${bet.liveScores.acceptedPickScore}</div>` : '';
+  acceptedDetails.innerHTML = `${acceptedScoresText}<div>${bet.acceptedPick}<br>${bet.acceptedOdds}<br><br>${bet.betTaker}</div>`;
+  detailsContainer.appendChild(acceptedDetails);
+
+  // Append the details container to the card
+  card.appendChild(detailsContainer);
 
   return card;
 }
+
+
 
 async function fetchBet365Data(eventId) {
   try {
@@ -764,14 +833,15 @@ function createWagerCard(wager) {
       wagerActionButton.classList.add('wager-action-button');
 
       if (wager.firstUser === currentUser) {
-          // If the current user is the one who placed the wager
           wagerActionButton.textContent = 'Delete Bet';
+          wagerActionButton.classList.add('button', 'button-delete'); // Add class for delete button
           wagerActionButton.addEventListener('click', () => deleteWager(wager));
       } else {
-          // If the current user is not the one who placed the wager
           wagerActionButton.textContent = 'Take Bet';
+          wagerActionButton.classList.add('button', 'button-take'); // Add class for take button
           wagerActionButton.addEventListener('click', () => handleTakeWager2(wager, currentUser, userGroup));
       }
+
 
       buttonContainer.appendChild(wagerActionButton);
       wagerCard.appendChild(buttonContainer);
@@ -822,7 +892,6 @@ function createDateTimeHeader(timestamp) {
 
 function handleTakeWager2(wager, currentUser, userGroup ) {
 
-  console.log('wagers: ' + wager.bet365Id);
   // Check if the firstUser is the same as the currentUser
   if (wager.firstUser === currentUser) {
     console.error("Can't bet yourself");
@@ -895,28 +964,35 @@ function displayUserRecords(userRecords) {
 
     // Initialize Tabulator for the user records table
     new Tabulator("#user-records-table", {
-        data: userRecords,
-        layout: "fitColumns",
-        columns: [
-            { title: "Opponent", field: "opponent" },
-            { title: "Wins", field: "wins" },
-            { title: "Losses", field: "losses" },
-            {
-                title: "Win %",
-                field: "winPercentage",
-                formatter: "progress", // Use the progress formatter
-                formatterParams: {
-                    min: 0,
-                    max: 100,
-                    color: ["red", "green"],
-                    legend: (value) => value + '%' // Add percentage symbol to legend
-                }
-            }
-        ],
-        initialSort: [ // Sort by win percentage column in descending order
-            { column: "winPercentage", dir: "desc" }
-        ]
-    });
+    data: userRecords,
+    layout: "fitColumns",
+    columns: [
+        { title: "User", field: "opponent" },
+        { title: "Wins", field: "wins" },
+        { title: "Losses", field: "losses" },
+        {
+            title: "Win %",
+            field: "winPercentage",
+            formatter: function(cell, formatterParams){
+                var value = cell.getValue();
+                var color = value >= 50 ? "green" : "red"; // Choose color based on value
+                // Return the cell content with conditional coloring without bold text
+                return "<span style='color: " + color + ";'>" + value + "%</span>";
+            },
+            sorter: "number",
+            sorterParams: {
+                format: {
+                    decimal: ".",
+                    thousand: "",
+                },
+            },
+        }
+    ],
+    initialSort: [ // Sort by win percentage column in descending order
+        { column: "winPercentage", dir: "desc" }
+    ]
+});
+
 }
 
 function deleteWager(wager) {

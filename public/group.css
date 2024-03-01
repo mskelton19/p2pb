@@ -1,5 +1,7 @@
+/* Universal Base Styles */
 body {
-  font-family: 'Roboto', sans-serif; /* Using Roboto font */
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px; /* Default font size */
 }
 
 table {
@@ -16,119 +18,128 @@ th, td {
 
 th {
   background-color: red;
-  color: #333; /* Darker text for better contrast */
+  color: #333;
   font-weight: normal;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #f9f9f9; /* Zebra striping for rows */
+  background-color: #f9f9f9;
 }
 
 tbody tr:hover {
-  background-color: #f1f1f1; /* Hover effect for rows */
+  background-color: #f1f1f1;
 }
 
 td {
-  border-bottom: 1px solid #ddd; /* Border for each cell */
+  border-bottom: 1px solid #ddd;
 }
 
-/* Responsive design adjustments */
-@media (max-width: 600px) {
-  body {
-    font-size: 16px; /* Increase font size for better readability on small screens */
-  }
-
-  table {
-    font-size: 14px; /* Adjust table font size for small screens */
-  }
-
-  th, td {
-    padding: 12px; /* Increase padding for better touch interaction */
-  }
-
-  .navbar ul {
-    font-size: 16px; /* Adjust navbar font size */
-  }
-
-  body {
-    font-family: 'Roboto', sans-serif;
-  }
-
-  .tabulator {
-border-radius: 8px;
-overflow: hidden;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+/* Additional styles for other elements */
+.tabulator {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  max-width: 350px;
 }
 
 .tabulator-header {
-background-color: blue; /* Change as per your color scheme */
-color: white;
-}
-
-.tabulator-row {
-border-bottom: 1px solid #ddd;
-}
-
-.tabulator-row:hover {
-background-color: #f5f5f5; /* Hover effect for rows */
-}
-
-.tabulator-cell {
-padding: 12px 15px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-.tabulator-cell {
-padding: 10px;
-}
-
-/* Style the tabs */
-#tabs {
-  overflow: hidden;
-  border-radius: 15px;
-  border: 2px solid #ccc;
-  background-color: #f1f1f1;
-  display: inline-block;
-}
-
-.tablinks {
-  background-color: #f2f2f2;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
-    font-weight: bold;
-    display: inline-block; /* Ensure tabs remain inline */
-    width: auto; /* Adjust width as needed */
-}
-
-
-.tabcontent {
-  display: none;
-  padding: 20px;
-  border: 1px solid #ccc;
-}
-
-.tabcontent.active {
-  display: block;
-}
-
-
-.table-header {
-  background-color: #4CAF50; /* Example: green background */
+  background-color: blue;
   color: white;
 }
 
+.tabulator-row {
+  border-bottom: 1px solid #ddd;
+}
+
+.tabulator-row:hover {
+  background-color: #f5f5f5;
+}
+
+.tabulator-cell {
+  padding: 12px 15px;
+}
+
+
+
+/* Center the tabs container */
+.tabs {
+  display: flex;
+  justify-content: center; /* Center tabs horizontally */
+  flex-wrap: wrap; /* Allow the tabs to wrap onto the next line if needed */
+  margin-bottom: 20px; /* Space below the tabs container */
+}
+
+/* Style for the tab buttons */
+.tablinks {
+  background-color: #eee; /* Light grey background */
+  border: none; /* Remove borders */
+  padding: 10px 20px; /* Top and bottom padding, left and right padding */
+  margin: 0 2px; /* Reduced margin between buttons for smaller space */
+  cursor: pointer; /* Cursor indicates clickable item */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+  font-weight: bold;
+}
+
+
+/* Hover and active state for tab buttons */
+.tablinks:hover, .tablinks.active {
+  background-color: #ddd; /* Slightly darker grey on hover/active */
+  color: #000; /* Black text color for better visibility */
+}
+
+/* Style for the tab content */
+.tabcontent {
+  display: none; /* Hide tab content by default */
+  animation: fadeIn 0.3s; /* Fade in effect when tab content becomes visible */
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Style for sub-tabs within 'My Bets' */
+.my-bets-tabs {
+  display: flex;
+  justify-content: center; /* Center sub-tabs within their container */
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+ background-color: #f0f0f0; /* Light background color for the tabs container */
+ box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+ border-radius: 5px; /* Rounded corners for modern look */
+}
+
+.sub-tablinks {
+  background-color: #ffffff; /* Light background making active tab stand out */
+  border: none;
+  padding: 10px 15px; /* Adequate padding for touch targets */
+  margin: 4px; /* Space between tabs */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s; /* Smooth background color change and slight grow effect */
+  border-radius: 4px; /* Rounded corners for tabs */
+  font-weight: 600; /* Slightly bolder font for better readability */
+}
+
+.sub-tablinks:hover, .sub-tablinks.active {
+  background-color: #007bff; /* Highlight color for hover and active states */
+  color: #ffffff; /* White text for contrast */
+  transform: translateY(-2px); /* Slight raise effect on hover */
+}
+
+/* Adjustments for content sections */
+.bets-section, .wagers-container {
+  padding: 10px; /* Padding inside content sections */
+  border: 1px solid #ccc; /* Border for content sections */
+  border-radius: 5px; /* Rounded corners for content sections */
+}
+
+/* Display the default open tab content */
 .default-open {
   display: block;
 }
-/* Add styles for the active tab */
-.tablinks.active {
-  background-color: #ccc;
-  color: #333;
-}
+
+
+
 
 #createBet-sports-icons-container {
   top: 50px; /* Height of the navbar, adjust if different */
@@ -168,4 +179,273 @@ padding: 10px;
   padding: 15px;
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Add this CSS to style the drawer */
+.drawer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 0;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: height 0.3s ease;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  /* padding: 7.5px; */
+}
+
+#drawer-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100vh; /* Take full viewport height */
+}
+
+.drawer-nav {
+  display: flex;
+   justify-content: flex-end; /* Align to the right */
+   padding: 10px; /* Add some padding */
+
+}
+
+/* Style the content inside the drawer */
+.drawer-content {
+  text-align: center;
+    /* padding: 1rem; */
+}
+
+/* Style the close button */
+.close-button {
+  background-color: #333333; /* Red background color */
+   color: #fff; /* White text color */
+   padding: 10px 20px; /* Padding for better appearance */
+   border: none; /* Remove border */
+   cursor: pointer;
+   font-size: 16px;
+   margin: 0; /* Ensure no margin is applied */
+   border-radius: 5px;
+}
+
+/* Add this CSS to style the drawer header with space between team name and odds */
+.drawer-header {
+  margin: 0; /* Remove default margin */
+  padding: 10px; /* Add padding for better appearance */
+}
+
+.drawer-info {
+  text-align: center;
+  margin-bottom: 10px; /* Space above the wager input */
+}
+
+.drawer-team-name,
+.drawer-odds {
+  display: inline; /* Inline display for same line */
+  margin: 0 5px;
+  font-weight: bold;
+}
+
+.drawer-odds::before {
+  content: '\00a0'; /* Add a non-breaking space before the odds */
+}
+
+#toast {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: black;
+    color: white;
+    padding: 8px 0; /* Reduced padding */
+    text-align: center;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+    font-size: 14px; /* Adjusted font size */
+}
+
+.button {
+  width: 90%; /* Adjust width as necessary */
+  padding: 15px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 25px;
+  height: 50px;
+  font-size: 16px;
+  display: block; /* Ensures the button takes up the full width available */
+  margin: 10px auto; /* Center button and provide some spacing */
+}
+
+.button-delete {
+    background-color: #dc3545; /* Bootstrap's danger color for reference */
+    color: white;
+}
+
+.button-take {
+    background-color: #28a745; /* Bootstrap's success color for reference */
+    color: white;
+}
+
+.button-delete:hover, .button-take:hover {
+    opacity: 0.8; /* Slightly darken the button on hover */
+}
+
+/* ------------------My Bets------------------- */
+
+.bet-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #ccc; /* Example styling */
+  margin: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Example shadow for depth */
+  border-radius: 5px; /* Example styling */
+}
+
+.game-time, .wager-amount {
+  margin-bottom: 10px; /* Add some space below these elements */
+}
+
+.details-container {
+  display: flex; /* Use Flexbox to place children side by side */
+  justify-content: space-between; /* Space out the child elements */
+}
+
+.original-details, .accepted-details {
+  flex: 1; /* Allow these elements to fill the available space equally */
+  padding: 5px; /* Add some padding */
+  border: 1px solid #eee; /* Example styling */
+  margin: 5px; /* Space between the two details sections */
+}
+
+/* Add a gap between the game time and the wager amount */
+.game-time + .wager-amount {
+  margin-top: 10px; /* Adjust according to your preference */
+}
+
+.bet-scores {
+  margin-bottom: 10px; /* Space below the scores */
+  padding-bottom: 5px; /* Space within the score area */
+  border-bottom: 1px solid #eee; /* A subtle line below the scores */
+  display: block; /* Ensure it's a block-level element to occupy full width */
+}
+
+.bet-card, .game-time, .wager-amount, .original-details, .accepted-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Aligns children (flex items) vertically center */
+  align-items: center; /* Aligns children (flex items) horizontally center */
+  text-align: center; /* Centers the text for direct text children */
+}
+
+.bet-scores {
+  background-color: #333; /* Dark background for contrast */
+  color: #fff; /* White text for visibility */
+  font-family: 'Courier New', Courier, monospace; /* Monospaced font for that digital look */
+  font-size: 1.2em; /* Increase the font size */
+  padding: 12px 24px; /* Slightly larger padding for emphasis */
+  margin-bottom: 20px; /* Space below the scoreboard */
+  border-radius: 8px; /* Slightly larger rounded corners */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Soft shadow for depth */
+  width: auto; /* Auto width based on content size */
+  justify-content: center; /* Center align the flex container content */
+  display: inline-flex; /* Use inline-flex to make the container size to its content */
+  align-items: center; /* Vertically center the content */
+  font-weight: bold;
+}
+
+/* Retaining enhancements for details containers */
+.original-details, .accepted-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 5px;
+  flex: 1;
+  padding: 10px 0; /* Retain padding for visual separation */
+}
+
+.original-details, .accepted-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 5px;
+  flex: 1;
+  padding: 10px; /* Ensure there's padding around the text */
+  min-width: 135px; /* Slightly more than our calculation to account for padding */
+  box-sizing: border-box; /* Ensures padding is included in the width calculation */
+}
+
+.details-container {
+  flex-wrap: wrap; /* Allows details to wrap if they don't fit side by side */
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.wager-amount {
+  font-size: 1.5em; /* Keep the font size larger for emphasis */
+  font-weight: bold; /* Maintain bold font weight for visibility */
+  color: black; /* A bright, eye-catching color - adjust as needed */
+  padding: 5px 0; /* Minimal padding to maintain spacing without a background */
+  margin: 10px 0; /* Space around the wager amount for separation from other elements */
+  display: inline; /* Adjust as necessary, inline keeps it within text flow */
+  text-align: center; /* Center-align the text if it fits the design */
+}
+
+/* If the wager amount is within a larger container, ensure it aligns well */
+.wager-container {
+  text-align: center; /* Center the wager amount text if it's within a container */
+}
+
+.bets-section {
+  display: grid;
+  grid-gap: 20px; /* Space between grid items */
+  padding: 20px; /* Padding around the entire grid */
+}
+
+/* Styles that adjust layout for smaller screens */
+@media (max-width: 500px) {
+  body, th, td {
+    font-size: 14px; /* Smaller font size for small screens */
+  }
+  /* Additional responsive styles for smaller screens */
+}
+
+/* Media queries to adjust the grid layout based on screen width */
+@media (min-width: 501px) and (max-width: 800px) {
+  .bets-section {
+    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns for mid-sized screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .sub-tablinks {
+    flex-grow: 1; /* Allow tabs to fill the available space */
+    margin: 4px 2px; /* Adjust margins for tighter spaces */
+    padding: 10px 5px; /* Adjust padding to fit smaller screens */
+  }
+}
+
+@media (min-width: 801px) and (max-width: 1100px) {
+  .bets-section {
+    grid-template-columns: repeat(3, 1fr); /* Increase to 3 columns for larger screens */
+  }
+}
+
+@media (min-width: 1101px) {
+  .bets-section {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for the largest screens */
+  }
+}
+
+@media (min-width: 401px) {
+  .tabulator {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 350px; /* Ensures tables don't stretch beyond this width */
+        overflow-x: auto; /* Allows for horizontal scrolling on smaller screens */
+    }
 }

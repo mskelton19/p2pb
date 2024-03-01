@@ -16,27 +16,62 @@ form {
 
 input[type="text"],
 input[type="password"],
+input[type="email"],
 select {
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
+    height: 50px;
     box-sizing: border-box;
+    background-color: #eef0f2;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 input[type="submit"] {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     border: none;
     background-color: #007bff;
     color: white;
-    border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+    border-radius: 25px;
+    height: 50px;
+    font-size: 16px;
+
 }
 
 input[type="submit"]:hover {
     background-color: #0056b3;
+    padding-top: 15px;
+}
+
+.form-button {
+  padding-top: 20px;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 350px;
+}
+
+.register-link {
+  color: #3164c8;
+  text-decoration: none;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.register-link a {
+  color: #3164c8;
+  text-decoration: none;
+}
+
+.form-group label {
+    align-self: flex-start; /* Aligns the label to the start (left) */
+    font-weight: bold;
 }
 
 /* Add this CSS to your existing styles */
@@ -63,7 +98,112 @@ input[type="submit"]:hover {
     display: block;
 }
 
-.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4); }
-.modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px
+  solid #888;
+  width: 30%;
+}
+
+.newGroupButton {
+  padding-top: 20px;
+}
+
+.modal button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 25px;
+  height: 50px;
+  font-size: 16px;
+}
+
 .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
 .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+
+/* Add this at the bottom of your CSS to target mobile devices specifically */
+@media (max-width: 450px) {
+    .modal-content {
+        width: 90%; /* Full width on devices less than 768px wide */
+        height: 35%; /* Optional: You may want the modal to cover the full height on mobile */
+        border-radius: 5px; /* Optional: Makes the modal content fully cover the screen corner edges on mobile */
+        max-height: 90vh;
+        transform: translateY(-70%);
+        top: 50%; /* Position at half the height of the viewport */
+        position: absolute; /* Switch to absolute positioning within the modal */
+    }
+    .modal-content input[type="text"],
+   .modal-content input[type="password"],
+   .modal-content input[type="email"],
+   .modal-content select {
+       padding: 8px 10px; /* Reduce padding */
+       margin: 8px 0; /* Adjust margins */
+       height: 40px; /* Adjust height as necessary */
+   }
+
+   .modal-content .newGroupButton button {
+       padding: 10px; /* Adjust button padding */
+       height: 40px; /* Adjust button height */
+       font-size: 14px; /* Adjust font size for better fit */
+   }
+}
+
+@media (min-width: 451px) and (max-width: 478px) {
+    .modal-content {
+        width: 90%; /* Full width on devices less than 768px wide */
+        height: 35%; /* Optional: You may want the modal to cover the full height on mobile */
+        border-radius: 5px; /* Optional: Makes the modal content fully cover the screen corner edges on mobile */
+        max-height: 90vh;
+        transform: translateY(-70%);
+        top: 50%; /* Position at half the height of the viewport */
+        position: absolute; /* Switch to absolute positioning within the modal */
+    }
+    .modal-content input[type="text"],
+   .modal-content input[type="password"],
+   .modal-content input[type="email"],
+   .modal-content select {
+       padding: 8px 10px; /* Reduce padding */
+       margin: 8px 0; /* Adjust margins */
+       height: 40px; /* Adjust height as necessary */
+   }
+
+   .modal-content .newGroupButton button {
+       padding: 10px; /* Adjust button padding */
+       height: 40px; /* Adjust button height */
+       font-size: 14px; /* Adjust font size for better fit */
+   }
+}
+
+#toast {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: blue;
+    color: white;
+    padding: 8px 0; /* Reduce padding for less vertical space */
+    text-align: center;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+    height: 30px; /* Adjust this value as needed to reduce the height */
+    line-height: 30px; /* Ensure this matches the height if you want the text vertically centered */
+}

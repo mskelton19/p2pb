@@ -148,8 +148,6 @@ let selectedOddsCard = null;
 
 function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName) {
 
-  console.log(leagueName)
-
   const oddsCard = document.createElement('div');
   oddsCard.classList.add('odds-card');
 
@@ -231,7 +229,6 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime, leagueNam
   const drawer = document.getElementById('drawer');
 
   const formattedOdds = odds > 0 ? `+${odds}` : odds;
-  console.log(formattedOdds);
 
   // document.getElementById('drawerTeamNames').textContent = `${awayTeamName} vs ${homeTeamName}`;
   document.getElementById('drawerTeamName').textContent = `${pick}`;
@@ -277,9 +274,6 @@ function hideDrawer() {
 // Add this function to handle confirming the wager
 function confirmWager2(teamNames, eventTime, username, leagueName, group) {
 
-  // console.log(group)
-  console.log(group)
-
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
   // Pass along taken odds
@@ -317,7 +311,6 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
     })
       .then(response => response.json())
       .then(data => {
-        console.log('Wager placed:', data.wager);
         hideDrawer();
         showToast('Wager placed successfully!');
         // Handle success or show a confirmation message to the user

@@ -58,13 +58,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Handle the creation of a new group via the modal
     document.getElementById("submitNewGroup").addEventListener("click", function() {
+        var email = document.getElementById('groupEmail').value;
         var group = document.getElementById("newGroup").value;
         var groupPassword = document.getElementById("newGroupPassword").value;
 
         fetch('/create-group', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ group, groupPassword }),
+            body: JSON.stringify({ email, group, groupPassword }),
         })
         .then(response => response.json())
         .then(data => {

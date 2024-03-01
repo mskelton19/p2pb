@@ -1,6 +1,6 @@
 /* Styles for the Navbar */
 .navbar {
-  background-color: #333;
+  background-color: #0056b3;
   position: sticky;
   top: 0;
   left: 0;
@@ -31,7 +31,7 @@
 
 /* Styles for the Logo */
 .menu .logo {
-  color: #fcb60e; /* Bright and modern color */
+  color: white; /* Bright and modern color */
     font-size: 24px; /* Adjust size as needed */
     font-weight: bold;
     letter-spacing: 1px; /* Adding some spacing between letters */

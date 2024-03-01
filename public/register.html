@@ -7,18 +7,33 @@
     <link rel="stylesheet" href="register.css">
 </head>
 <body>
-    <form action="/register" method="POST">
+    <form class="login-form" action="/register" method="post">
         <h2>Register</h2>
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <select id="groupSelect" name="group" required>
-            <option value="">Select Group</option>
-            <!-- Group options will be dynamically filled -->
-        </select>
-        <input type="password" name="groupPassword" placeholder="Group Password" required>
-        <!-- The group password input will be dynamically added here -->
-        <input type="submit" value="Register">
-        <a href="#" id="createGroupLink">Create Group</a>
+        <div class='form-group'>
+          <label for="username">Username</label>
+          <input type="text" name="username" required>
+        </div>
+        <div class='form-group'>
+          <label for="password">Password</label>
+          <input type="password" name="password" required>
+        </div>
+        <div class='form-group'>
+          <label for="groupSelect">Select Group</label>
+          <select id="groupSelect" name="group" required>
+              <option value="groupSelect">Select Group</option>
+              <!-- Group options will be dynamically filled -->
+          </select>
+        </div>
+        <div class='form-group'>
+          <label for="password">Group Password</label>
+          <input type="password" name="groupPassword" required>
+        </div>
+        <div class="form-button">
+          <input type="submit" value="Register">
+        </div>
+        <div class='register-link'>
+          <a href="#" id="createGroupLink">No Group? Create one here</a>
+        </div>
     </form>
 
 <!-- Create Group Modal (hidden by default) -->
@@ -26,9 +41,12 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Create New Group</h2>
+        <input type="email" id="groupEmail" placeholder="Email" required>
         <input type="text" id="newGroup" placeholder="Group Name" required>
         <input type="password" id="newGroupPassword" placeholder="Group Password" required>
-        <button id="submitNewGroup">Create Group</button>
+        <div class='newGroupButton'>
+          <button id="submitNewGroup">Create Group</button>
+        </div>
     </div>
 </div>
 

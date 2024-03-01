@@ -187,7 +187,7 @@ app.post('/login', async (req, res, next) => {
       }
     });
   } else {
-    res.redirect('/login'); // Redirect back to login on failure
+    res.redirect('/login?loginFailed=true');
   }
 });
 
@@ -471,6 +471,7 @@ async function updateBetStatuses() {
 // Schedule the task to run every minute
 cron.schedule('* * * * *', updateBetStatuses);
 
+let liveScoresCache = {};
 // Function to check the status of in-progress games and update them if finished
 async function updateBetStatusesToFinished() {
   const inProgressBets = await fetchInProgressBets();
@@ -478,11 +479,18 @@ async function updateBetStatusesToFinished() {
   for (const bet of inProgressBets) {
     try {
       const results = await fetchBet365Results(bet.eventId);
-      const scores = await processGameResults(results, bet);
+      let scores;
 
-      console.log('scores', scores)
-
-      if (results && isEventFinished(results)) {
+      if(results && !isEventFinished(results)) {
+        const scores = await processGameResults(results, bet);
+        liveScoresCache[bet.eventId] = { scores, lastUpdated: new Date()  };
+        await updateBetsWithLiveScores(bet.eventId, scores);
+        console.log('scores ', scores);
+      } else if ( results && isEventFinished(results)) {
+        if (!scores) {
+        scores = await processGameResults(results, bet); // Consider fetching scores here too if needed
+        }
+        console.log('scores', scores)
         bet.originalScore = scores.originalPickScore;
         bet.acceptedScore = scores.acceptedPickScore;
 
@@ -510,10 +518,43 @@ async function updateBetStatusesToFinished() {
         bet.status = 'finished';
         await moveBetToFinished(bet);
       }
-    } catch (err) {
-      console.error('Error updating bet status for bet ID:', bet._id, err);
+
+      // console.log('scores +++++', scores)
+        } catch (err) {
+            console.error('Error processing bet ID:', bet._id, err);
+        }
     }
-  }
+
+    // If there are live scores to report back to the client
+ if (liveScoresData.length > 0) {
+     return liveScoresData; // Return live scores data for in-progress games
+ }
+
+ // Otherwise, you might return null or an empty array to indicate no live scores are available
+ return null;
+}
+
+app.get('/live-scores', (req, res) => {
+  console.log('in live scores function')
+    res.json({ success: true, liveScores: liveScoresCache });
+});
+
+async function updateBetsWithLiveScores(eventId, scores) {
+    try {
+        // Update bets in the database where eventId matches
+        await acceptedBetsCollection.updateMany(
+            { eventId: eventId }, // Filter
+            {
+                $set: {
+                    "liveScores.originalPickScore": scores.originalPickScore,
+                    "liveScores.acceptedPickScore": scores.acceptedPickScore,
+                    "liveScores.lastUpdated": new Date() // Optional: track when the scores were last updated
+                }
+            }
+        );
+    } catch (error) {
+        console.error('Error updating bets with live scores:', error);
+    }
 }
 
 async function updateWinLossStats(winnerUsername, loserUsername) {
@@ -1014,10 +1055,11 @@ app.get('/groups', async (req, res) => {
 });
 
 app.post('/create-group', async (req, res) => {
-    const { group, groupPassword } = req.body;
+    const { email, group, groupPassword } = req.body;
+    console.log(email)
     try {
         const hash = await bcrypt.hash(groupPassword, 10);
-        await groupsCollection.insertOne({ group, password: hash });
+        await groupsCollection.insertOne({ email, group, password: hash });
         // Assuming group creation is successful, send back a response indicating success and the groupName
         res.json({ success: true, message: 'Group created successfully.', group: group });
     } catch (error) {
