@@ -19,7 +19,7 @@
   },
   "name": "betapp",
   "version": "1.0.0",
-  "main": "server.js", // Adjusted to match your start script
+  "main": "server.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
