@@ -42,11 +42,6 @@ td {
   max-width: 350px;
 }
 
-.tabulator-header {
-  background-color: blue;
-  color: white;
-}
-
 .tabulator-row {
   border-bottom: 1px solid #ddd;
 }
@@ -104,9 +99,9 @@ td {
   display: flex;
   justify-content: center; /* Center sub-tabs within their container */
   flex-wrap: wrap; /* Allow wrapping for smaller screens */
- background-color: #f0f0f0; /* Light background color for the tabs container */
- box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
- border-radius: 5px; /* Rounded corners for modern look */
+  background-color: #f0f0f0; /* Light background color for the tabs container */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+  border-radius: 5px; /* Rounded corners for modern look */
 }
 
 .sub-tablinks {
@@ -265,17 +260,18 @@ td {
 }
 
 .button {
-  width: 90%; /* Adjust width as necessary */
+  width: 60%; /* Adjust width as necessary */
   padding: 15px;
   border: none;
   color: white;
   cursor: pointer;
   font-weight: bold;
   border-radius: 25px;
-  height: 50px;
-  font-size: 16px;
+  height: 40px;
+  font-size: 1.8em;
   display: block; /* Ensures the button takes up the full width available */
   margin: 10px auto; /* Center button and provide some spacing */
+  font-size: 16px;
 }
 
 .button-delete {
@@ -306,6 +302,7 @@ td {
 
 .game-time, .wager-amount {
   margin-bottom: 10px; /* Add some space below these elements */
+  font-size: 20px;
 }
 
 .details-container {
@@ -406,6 +403,55 @@ td {
   padding: 20px; /* Padding around the entire grid */
 }
 
+.bet-card .game-time {
+  font-weight: bold;
+}
+
+/* ---------------Create Bet----------------- */
+.time {
+  background-color: #0056b3;
+    padding: 5px 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    width: max-content;
+    border-width: medium;
+    font-weight: bold;
+    margin: auto;
+}
+
+/* ------------Open Bets--------------------- */
+.time-wagers {
+    background-color: #0056b3;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    text-align: left;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    color: white;
+    width: max-content;
+    margin: 10px auto;
+    font-size: 16px;
+}
+
+.wager-card {
+  display: block;
+  max-width: 375px;
+  width: 95%; /* Adjust the width as needed */
+  margin: 0 auto; /* Center the card */
+  margin-bottom: 5px; /* Space between cards */
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  font-size: 1.0em;
+}
+
+
 /* Styles that adjust layout for smaller screens */
 @media (max-width: 500px) {
   body, th, td {
@@ -419,6 +465,7 @@ td {
   .bets-section {
     grid-template-columns: repeat(2, 1fr); /* Keep 2 columns for mid-sized screens */
   }
+
 }
 
 @media (max-width: 768px) {
@@ -445,7 +492,7 @@ td {
   .tabulator {
         margin-left: auto;
         margin-right: auto;
-        max-width: 350px; /* Ensures tables don't stretch beyond this width */
+        max-width: 375px; /* Ensures tables don't stretch beyond this width */
         overflow-x: auto; /* Allows for horizontal scrolling on smaller screens */
     }
 }

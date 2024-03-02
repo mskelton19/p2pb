@@ -1,54 +1,5 @@
 /* styles.css */
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: white;
-  color: #333;
-}
-
-.time {
-  background-color: #f0f0f0f0; /* Light background */
-    padding: 5px 10px;
-    margin-bottom: 10px;
-    text-align: left;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: #333;
-    width: max-content;
-    border-width: medium;
-    font-weight: bold;
-    margin: 10px auto; /* Center the date container */ */
-}
-
-.time-wagers {
-    background-color: #f7f7f7; /* Light background */
-    padding: 5px 10px;
-    margin-bottom: 5px;
-    text-align: left;
-    border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-weight: bold;
-    color: #333;
-    width: max-content;
-    margin: 10px auto; /* Center the date container */ */
-
-}
-
-
-.wager-card {
-  display: block;
-  width: 95%; /* Adjust the width as needed */
-  margin: 0 auto; /* Center the card */
-  margin-bottom: 5px; /* Space between cards */
-  border: 1px solid #ccc;
-  padding: 5px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: white;
-  font-size: 1.0em;
-}
-
-
 .wager-card h2, .wager-card h3, .wager-card .button {
   font-size: 0.8em; /* smaller font size for headers and buttons */
 }
@@ -292,6 +243,10 @@ body {
     background-color: gray;
     color: #666;
     cursor: not-allowed;
+}
+
+.wagerCard {
+  max-width: 25%;
 }
 
 /* Style for the "Take Wager" button */

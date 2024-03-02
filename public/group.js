@@ -441,10 +441,9 @@ function openSubTab(subTabName) {
 
 
 // ------------------------Stats Tab----------------------------------------
-function setupGroupPage(){
-
+function setupGroupPage() {
   var table = new Tabulator("#group-table", {
-    data: groupUsersData,
+    data: groupUsersData, // Your data array
     columns: [
       { title: "User", field: "username" },
       { title: "Wins", field: "wins" },
@@ -454,7 +453,6 @@ function setupGroupPage(){
         field: "winPct",
         formatter: function(cell, formatterParams) {
           var value = cell.getValue();
-          // Check if value is above 50% and apply color styling
           if (value > 50) {
             return "<div style='color: green;'>" + value + "%</div>"; // Green for above 50%
           } else {
@@ -481,9 +479,16 @@ function setupGroupPage(){
     initialSort: [
       { column: "winPct", dir: "desc" },
     ],
+    // Use the rendered callback to apply styles after the table has been drawn
+    rendered: function() {
+      document.querySelectorAll("#group-table .tabulator-header").forEach(function(header) {
+        header.style.backgroundColor = "blue";
+        header.style.color = "white";
+      });
+    },
   });
-
 }
+
 
 async function fetchSportsStats() {
   try {
