@@ -9,7 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const ejs = require('ejs');
 const {v4: uuidv4} = require('uuid');
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const mongoUri = process.env.MONGO_URI;
 const { MongoClient, ObjectId } = require('mongodb');
 const mongoClient = new MongoClient(mongoUri);
@@ -102,12 +102,12 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Group not found.' });
         }
 
-        const passwordMatch = await bcrypt.compare(groupPassword, groupDoc.password);
+        const passwordMatch = await bcryptjs.compare(groupPassword, groupDoc.password);
         if (!passwordMatch) {
             return res.status(400).json({ success: false, message: 'Incorrect group password.' });
         }
 
-        const hash = await bcrypt.hash(password, 10);
+        const hash = await bcryptjs.hash(password, 10);
         // Create the user document including the groupName, and initializing wins and losses to 0
         const newUser = {
             username,
@@ -164,7 +164,7 @@ app.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
   const user = await usersCollection.findOne({ username });
 
-  if (user && bcrypt.compareSync(password, user.password)) {
+  if (user && bcryptjs.compareSync(password, user.password)) {
     req.login(user, async (err) => { // Mark this callback as async
       if (err) { return next(err); }
 
@@ -1058,7 +1058,7 @@ app.post('/create-group', async (req, res) => {
     const { email, group, groupPassword } = req.body;
     console.log(email)
     try {
-        const hash = await bcrypt.hash(groupPassword, 10);
+        const hash = await bcryptjs.hash(groupPassword, 10);
         await groupsCollection.insertOne({ email, group, password: hash });
         // Assuming group creation is successful, send back a response indicating success and the groupName
         res.json({ success: true, message: 'Group created successfully.', group: group });
