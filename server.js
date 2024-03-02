@@ -9,7 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const ejs = require('ejs');
 const {v4: uuidv4} = require('uuid');
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const mongoUri = process.env.MONGO_URI;
 const { MongoClient, ObjectId } = require('mongodb');
 const mongoClient = new MongoClient(mongoUri);
