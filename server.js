@@ -1072,6 +1072,9 @@ app.get('/create-group', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'create-group.html'));
 });
 
+app.get('/favicon.ico', (req, res) => res.status(204));
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
