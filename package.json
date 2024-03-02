@@ -25,6 +25,6 @@
   "license": "ISC",
   "description": "",
   "engines": {
-    "node": "v16.15.1"
+    "node": "16.15.1"
   }
 }
