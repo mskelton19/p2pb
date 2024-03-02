@@ -45,7 +45,7 @@ let savedEventData = [];
 
 // Express server
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const apiKey = process.env.BET365_API_KEY; // Replace with your Bet365 API key
 const apiUrl = 'https://api.b365api.com/v1/bet365';
