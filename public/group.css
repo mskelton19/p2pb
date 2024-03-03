@@ -461,8 +461,7 @@ td {
 @media (max-width: 500px) {
   body, th, td {
     font-size: 14px; /* Smaller font size for small screens */
-  },
-  {margin: auto;}
+  }
   /* Additional responsive styles for smaller screens */
 }
 
