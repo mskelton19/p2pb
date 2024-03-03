@@ -4,15 +4,6 @@
   font-size: 0.8em; /* smaller font size for headers and buttons */
 }
 
-.event-card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 5px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #f0f0f0;
-}
-
 .bet-types-container {
   display: flex;
   justify-content: space-between;
@@ -25,15 +16,6 @@
   text-align: center; /* Center text within each section */
   font-size: 12px;
   /* Additional styling as needed */
-}
-
-/* Additional styling for individual bet types if needed */
-.bet-type:first-child {
-  /* Styling specific to the first bet type */
-}
-
-.bet-type:last-child {
-  /* Styling specific to the second bet type */
 }
 
 .team-card {
@@ -341,12 +323,6 @@ h4 {
   font-size: 0.8em; /* You can adjust the font size as needed */
 }
 
-.time {
-  text-align: left;
-  background-color: #f0f0f0;
-  border: 10px;
-}
-
 .wager {
   margin-bottom: 5px;
   margin-top: 10px;
@@ -394,27 +370,6 @@ h1 {
 }
 
 
-.bet-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  width: 90%; /* Adjust based on your layout */
-  max-width: 600px; /* Optional, for wider screens */
-  display: flex; /* Make the bet card a flex container */
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center-align items horizontally */
-  margin-bottom: 20px; /* Space between cards */
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.bet-card h2 {
-  color: #007bff; /* Vibrant blue for headings */
-  margin-top: 0;
-}
 
 .bet-card button {
   background-color: #007bff; /* Vibrant blue for buttons */
@@ -573,27 +528,27 @@ h1 {
 }
 
 /* Card Container */
-#events-container .event-card {
-    background-color: #ffffff; /* White background for the card */
-    border: 1px solid #e0e0e0; /* Light grey border */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border-radius: 8px; /* Rounded corners */
-    margin-bottom: 20px; /* Spacing between cards */
-    overflow: hidden; /* Ensures the content fits within the rounded corners */
-}
+/* #events-container .event-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+} */
 
 /* Card Header, if there is one */
-#events-container .event-card .card-header {
-    background-color: #f7f7f7; /* Lighter background for the header */
-    border-bottom: 1px solid #e0e0e0; /* Separation line */
-    padding: 10px; /* Padding around header content */
-    font-weight: bold; /* Make text bold */
-}
+/* #events-container .event-card .card-header {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    font-weight: bold;
+} */
 
 /* Card Body */
-#events-container .event-card .card-body {
-    padding: 15px; /* Padding inside the card */
-}
+/* #events-container .event-card .card-body {
+    padding: 15px;
+} */
 
 .toast-message {
   position: fixed;
@@ -632,26 +587,4 @@ h1 {
     font-size: 24px;
     color: #333;
     z-index: 1000; /* Make sure it's above other elements */
-}
-
-.floating-button {
-    position: fixed; /* Fixed position */
-    bottom: 20px; /* 20px from the bottom */
-    right: 20px; /* 20px from the right */
-    background-color: #007bff; /* Blue background color */
-    color: white; /* White text color */
-    border-radius: 50%; /* Circular shape */
-    text-align: center; /* Center the '+' inside the button */
-    line-height: 50px; /* Center the '+' vertically */
-    width: 50px; /* Width of the button */
-    height: 50px; /* Height of the button */
-    font-size: 30px; /* Size of the '+' sign */
-    text-decoration: none; /* Remove underline from the link */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for the button */
-    transition: background-color 0.3s ease; /* Transition effect */
-    z-index: 1052; /* Ensure button is above navbar */
-}
-
-.floating-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
 }

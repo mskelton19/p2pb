@@ -39,7 +39,9 @@ td {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  max-width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 375px;
 }
 
 .tabulator-row {
@@ -62,7 +64,12 @@ td {
   justify-content: center; /* Center tabs horizontally */
   flex-wrap: wrap; /* Allow the tabs to wrap onto the next line if needed */
   margin-bottom: 20px; /* Space below the tabs container */
+  position: sticky; /* Make the tabs stick to the top of the viewport */
+  top: 0; /* Distance from the top of the viewport */
+  background-color: inherit; /* Set a background color to ensure the text behind doesn't show through */
+  z-index: 1000; /* Ensure the tabs stay on top of other content */
 }
+
 
 /* Style for the tab buttons */
 .tablinks {
@@ -102,17 +109,21 @@ td {
   background-color: #f0f0f0; /* Light background color for the tabs container */
   box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
   border-radius: 5px; /* Rounded corners for modern look */
+  margin-left: auto; /* Center the element horizontally */
+  margin-right: auto; /* Center the element horizontally */
+  max-width: 375px;
 }
 
 .sub-tablinks {
   background-color: #ffffff; /* Light background making active tab stand out */
   border: none;
-  padding: 10px 15px; /* Adequate padding for touch targets */
+  padding: 5px 10px; /* Adequate padding for touch targets */
   margin: 4px; /* Space between tabs */
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s; /* Smooth background color change and slight grow effect */
   border-radius: 4px; /* Rounded corners for tabs */
   font-weight: 600; /* Slightly bolder font for better readability */
+  font-size: 12px;
 }
 
 .sub-tablinks:hover, .sub-tablinks.active {
@@ -148,6 +159,10 @@ td {
   box-shadow: 0 4px 8px -2px rgba(0,0,0,0.2); /* Added shadow */
   position: sticky;
   margin-bottom: 15px;
+  max-width: 375px;
+  margin-left: auto; /* Center the element horizontally */
+  margin-right: auto; /* Center the element horizontally */
+  border-radius: 5px;
 }
 
 .createBet-sport-icon {
@@ -157,7 +172,7 @@ td {
   font-size: 16px;
   cursor: pointer;
   border-radius: 5px; /* Rounded corners */
-  /* transition: background-color 0.1s; */
+  transition: background-color 0.1s;
 }
 
 .createBet-sport-icon:hover {
@@ -166,14 +181,6 @@ td {
 
 .createBet-sport-icon .highlighted-icon {
     background-color: red; /* Example background color for highlighting */
-}
-
-.finished-event-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Add this CSS to style the drawer */
@@ -291,42 +298,53 @@ td {
 /* ------------------My Bets------------------- */
 
 .bet-card {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  border: 1px solid #ccc; /* Example styling */
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Example shadow for depth */
-  border-radius: 5px; /* Example styling */
+  width: 90%; /* Adjust based on your layout */
+  display: flex; /* Make the bet card a flex container */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center-align items horizontally */
+  margin-bottom: 20px; /* Space between cards */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 375px;
 }
 
 .game-time, .wager-amount {
   margin-bottom: 10px; /* Add some space below these elements */
-  font-size: 20px;
+  font-size: 16px;;
 }
 
 .details-container {
-  display: flex; /* Use Flexbox to place children side by side */
-  justify-content: space-between; /* Space out the child elements */
+  display: flex; /* Continue using Flexbox */
+  gap: 20px; /* This creates space between flex items */
+  padding: 10px; /* Add padding around the edges to ensure the background extends around the children */
+  border-radius: 5px;
 }
 
 .original-details, .accepted-details {
-  flex: 1; /* Allow these elements to fill the available space equally */
-  padding: 5px; /* Add some padding */
-  border: 1px solid #eee; /* Example styling */
-  margin: 5px; /* Space between the two details sections */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 5px 0; /* Adjusted to apply margin only to the top and bottom */
+  flex: 1;
+  padding: 10px; /* Padding inside each details section */
+  min-width: 135px; /* Minimum width for each section */
+  box-sizing: border-box; /* Makes sure padding is included in the width/height calculations */
+  background-color: white;
+  border-radius: 5px;
 }
 
 /* Add a gap between the game time and the wager amount */
 .game-time + .wager-amount {
   margin-top: 10px; /* Adjust according to your preference */
-}
-
-.bet-scores {
-  margin-bottom: 10px; /* Space below the scores */
-  padding-bottom: 5px; /* Space within the score area */
-  border-bottom: 1px solid #eee; /* A subtle line below the scores */
-  display: block; /* Ensure it's a block-level element to occupy full width */
 }
 
 .bet-card, .game-time, .wager-amount, .original-details, .accepted-details {
@@ -338,7 +356,7 @@ td {
 }
 
 .bet-scores {
-  background-color: #333; /* Dark background for contrast */
+  background-color: #0056b3; /* Dark background for contrast */
   color: #fff; /* White text for visibility */
   font-family: 'Courier New', Courier, monospace; /* Monospaced font for that digital look */
   font-size: 1.2em; /* Increase the font size */
@@ -353,41 +371,12 @@ td {
   font-weight: bold;
 }
 
-/* Retaining enhancements for details containers */
-.original-details, .accepted-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin: 5px;
-  flex: 1;
-  padding: 10px 0; /* Retain padding for visual separation */
-}
-
-.original-details, .accepted-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin: 5px;
-  flex: 1;
-  padding: 10px; /* Ensure there's padding around the text */
-  min-width: 135px; /* Slightly more than our calculation to account for padding */
-  box-sizing: border-box; /* Ensures padding is included in the width calculation */
-}
-
-.details-container {
-  flex-wrap: wrap; /* Allows details to wrap if they don't fit side by side */
-  justify-content: space-around;
-  align-items: flex-start;
-}
-
 .wager-amount {
-  font-size: 1.5em; /* Keep the font size larger for emphasis */
+  font-size: 1.25em; /* Keep the font size larger for emphasis */
   font-weight: bold; /* Maintain bold font weight for visibility */
   color: black; /* A bright, eye-catching color - adjust as needed */
   padding: 5px 0; /* Minimal padding to maintain spacing without a background */
-  margin: 10px 0; /* Space around the wager amount for separation from other elements */
+  margin: 5px 0; /* Space around the wager amount for separation from other elements */
   display: inline; /* Adjust as necessary, inline keeps it within text flow */
   text-align: center; /* Center-align the text if it fits the design */
 }
@@ -404,22 +393,44 @@ td {
 }
 
 .bet-card .game-time {
+  background-color: #0056b3;
+  padding: 3px 5px;
+  text-align: left;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+  width: max-content;
+  border-width: medium;
   font-weight: bold;
+  margin: auto;
 }
 
 /* ---------------Create Bet----------------- */
 .time {
   background-color: #0056b3;
-    padding: 5px 10px;
-    margin-bottom: 20px;
+    padding: 3px 5px;
     text-align: left;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     color: white;
     width: max-content;
     border-width: medium;
     font-weight: bold;
     margin: auto;
+    margin-bottom: 20px;
+}
+
+/* ------------Create Bets------------------- */
+.event-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 5px;
+  margin-left: auto; /* Center the element horizontally */
+  margin-right: auto; /* Center the element horizontally */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+  max-width: 375px;
 }
 
 /* ------------Open Bets--------------------- */
@@ -451,11 +462,65 @@ td {
   font-size: 1.0em;
 }
 
+/* ---------Floating Button--------- */
+.floating-button {
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* 20px from the bottom */
+    right: 20px; /* 20px from the right */
+    background-color: #007bff; /* Blue background color */
+    color: white; /* White text color */
+    border-radius: 50%; /* Circular shape */
+    text-align: center; /* Center the '+' inside the button */
+    line-height: 50px; /* Center the '+' vertically */
+    width: 50px; /* Width of the button */
+    height: 50px; /* Height of the button */
+    font-size: 30px; /* Size of the '+' sign */
+    text-decoration: none; /* Remove underline from the link */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for the button */
+    transition: background-color 0.3s ease; /* Transition effect */
+    z-index: 1052; /* Ensure button is above navbar */
+}
+
+.floating-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
 
 /* Styles that adjust layout for smaller screens */
 @media (max-width: 500px) {
   body, th, td {
-    font-size: 14px; /* Smaller font size for small screens */
+    font-size: 16px; /* Smaller font size for small screens */
+  }
+  .tabs {
+    display: flex;
+    justify-content: center; /* Center tabs horizontally */
+    flex-wrap: wrap; /* Allow the tabs to wrap onto the next line if needed */
+    margin-bottom: 20px; /* Space below the tabs container */
+    position: sticky; /* Make the tabs stick to the top of the viewport */
+    top: 0; /* Distance from the top of the viewport */
+    background-color: inherit; /* Set a background color to ensure the text behind doesn't show through */
+    z-index: 1000; /* Ensure the tabs stay on top of other content */
+  }
+  .tablinks {
+    background-color: #eee; /* Light grey background */
+    border: none; /* Remove borders */
+    padding: 10px 0; /* Adjusted padding for top and bottom */
+    flex-grow: 1; /* Allow buttons to grow and fill the container */
+    text-align: center; /* Ensure text is centered within each tab */
+    cursor: pointer; /* Cursor indicates clickable item */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    font-weight: bold;
+    margin: 2; /* Remove margin to allow buttons to touch each other */
+  }
+  .sub-tablinks {
+    background-color: #ffffff; /* Light background making active tab stand out */
+    border: none;
+    padding: 5px 10px; /* Adequate padding for touch targets */
+    margin: 4px; /* Space between tabs */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Smooth background color change and slight grow effect */
+    border-radius: 4px; /* Rounded corners for tabs */
+    font-weight: 600; /* Slightly bolder font for better readability */
+    font-size: 15px;
   }
   /* Additional responsive styles for smaller screens */
 }
@@ -465,12 +530,10 @@ td {
   .bets-section {
     grid-template-columns: repeat(2, 1fr); /* Keep 2 columns for mid-sized screens */
   }
-
 }
 
 @media (max-width: 768px) {
   .sub-tablinks {
-    flex-grow: 1; /* Allow tabs to fill the available space */
     margin: 4px 2px; /* Adjust margins for tighter spaces */
     padding: 10px 5px; /* Adjust padding to fit smaller screens */
   }
