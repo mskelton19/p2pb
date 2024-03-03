@@ -675,7 +675,7 @@ function createBetCard(bet) {
   // Game time
   const gameTime = document.createElement('div');
   gameTime.classList.add('game-time');
-  // gameTime.textContent = `${new Date(bet.gameTime).toLocaleString()}`;
+  gameTime.textContent = `${new Date(bet.gameTime).toLocaleString()}`;
   card.appendChild(gameTime);
 
   // Wager amount
