@@ -40,6 +40,11 @@ td {
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   max-width: 350px;
+  .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .tabulator-row {
@@ -456,7 +461,8 @@ td {
 @media (max-width: 500px) {
   body, th, td {
     font-size: 14px; /* Smaller font size for small screens */
-  }
+  },
+  {margin: auto;}
   /* Additional responsive styles for smaller screens */
 }
 

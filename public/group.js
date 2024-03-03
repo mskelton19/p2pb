@@ -366,6 +366,8 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
 
   const gameTime = eventTime;
 
+  console.log('gametime', gameTime);
+
   const sportId = selectedOddsCard.dataset.sportId;
   const eventId = selectedOddsCard.dataset.eventId;
 

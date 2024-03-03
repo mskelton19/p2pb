@@ -280,6 +280,8 @@ app.post('/place-wager', express.json(), async (req, res) => {
 
   const wagerId = uuidv4();
 
+  console.log('event time', eventTime)
+
   const newWager = {
     teamName,
     openTeam,
