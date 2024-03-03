@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
   fetchSportsStats();
   fetchUserRecords();
+  setupFloatingActionButtonListener();
   // startLiveScoreUpdates(); // Start the live score updates
 })
 
@@ -79,6 +80,17 @@ function openTab(tabName) {
   if (tabName === 'createBet') {
         setupCreateBetTab(); // Initialize or refresh the content for "Create Bet"
         fetchEventsForCreateBet(18, 10042997); // Example: Fetch NFL events as the tab is opened
+  }
+}
+
+function setupFloatingActionButtonListener() {
+  const floatingActionButton = document.querySelector('.floating-button');
+  if (floatingActionButton) {
+    floatingActionButton.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the default action
+      // Programmatically click the "Create Bet" tab
+      document.getElementById('createBetTab').click();
+    });
   }
 }
 
@@ -435,7 +447,7 @@ function openSubTab(subTabName) {
     element.className = element.className.replace(" active", "");
   });
 
-  document.getElementById(subTabName).style.display = "block";
+  document.getElementById(subTabName).style.display = "grid";
   // No need for active class adjustment as it's done within the buttons themselves
 }
 

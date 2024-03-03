@@ -133,11 +133,7 @@ td {
 }
 
 /* Adjustments for content sections */
-.bets-section, .wagers-container {
-  padding: 10px; /* Padding inside content sections */
-  border: 1px solid #ccc; /* Border for content sections */
-  border-radius: 5px; /* Rounded corners for content sections */
-}
+
 
 /* Display the default open tab content */
 .default-open {
@@ -195,6 +191,7 @@ td {
   transition: height 0.3s ease;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  max-width: 375px;
   /* padding: 7.5px; */
 }
 
@@ -282,8 +279,17 @@ td {
 }
 
 .button-delete {
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  text-align: center; /* Ensure text itself is centered */
+  width: auto; /* Adjust width as needed, or set to 100% if you want the button to expand to container width */
+  padding: 10px; /* Adjust padding to ensure text is centered, consider reducing if text appears offset */
+  font-size: 16px; /* Adjust font size as needed for readability */
+  margin: 0 auto; /* Center button horizontally within its container */
     background-color: #dc3545; /* Bootstrap's danger color for reference */
     color: white;
+    width: 50%;
 }
 
 .button-take {
@@ -314,6 +320,7 @@ td {
   margin-left: auto;
   margin-right: auto;
   max-width: 375px;
+  border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
 
 .game-time, .wager-amount {
@@ -340,6 +347,8 @@ td {
   box-sizing: border-box; /* Makes sure padding is included in the width/height calculations */
   background-color: white;
   border-radius: 5px;
+  max-width: 175px;
+  border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
 
 /* Add a gap between the game time and the wager amount */
@@ -356,8 +365,8 @@ td {
 }
 
 .bet-scores {
-  background-color: #0056b3; /* Dark background for contrast */
-  color: #fff; /* White text for visibility */
+  background-color: lightgray; /* Dark background for contrast */
+  color: black; /* White text for visibility */
   font-family: 'Courier New', Courier, monospace; /* Monospaced font for that digital look */
   font-size: 1.2em; /* Increase the font size */
   padding: 12px 24px; /* Slightly larger padding for emphasis */
@@ -369,7 +378,9 @@ td {
   display: inline-flex; /* Use inline-flex to make the container size to its content */
   align-items: center; /* Vertically center the content */
   font-weight: bold;
+  border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
+
 
 .wager-amount {
   font-size: 1.25em; /* Keep the font size larger for emphasis */
@@ -386,10 +397,11 @@ td {
   text-align: center; /* Center the wager amount text if it's within a container */
 }
 
-.bets-section {
+.bets-section.sub-tabcontent {
   display: grid;
-  grid-gap: 20px; /* Space between grid items */
+  grid-gap: 20px; /* Adjust the gap between grid items */
   padding: 20px; /* Padding around the entire grid */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Create a responsive grid */
 }
 
 .bet-card .game-time {
@@ -403,6 +415,27 @@ td {
   border-width: medium;
   font-weight: bold;
   margin: auto;
+}
+
+#wagers-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* example for a responsive grid */
+  gap: 10px;
+  flex-direction: column;
+  align-items: center; /* Align items to the start horizontally */
+  justify-content: flex-start; /* Align items to the start vertically */
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+
+
+#wagers-list {
+  list-style: none; /* Remove default list styling */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+  width: 100%;
 }
 
 /* ---------------Create Bet----------------- */
@@ -431,6 +464,7 @@ td {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: #f0f0f0;
   max-width: 375px;
+  border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
 
 /* ------------Open Bets--------------------- */
@@ -467,7 +501,7 @@ td {
     position: fixed; /* Fixed position */
     bottom: 20px; /* 20px from the bottom */
     right: 20px; /* 20px from the right */
-    background-color: #007bff; /* Blue background color */
+    background-color: #0056b3; /* Blue background color */
     color: white; /* White text color */
     border-radius: 50%; /* Circular shape */
     text-align: center; /* Center the '+' inside the button */
@@ -526,28 +560,10 @@ td {
 }
 
 /* Media queries to adjust the grid layout based on screen width */
-@media (min-width: 501px) and (max-width: 800px) {
-  .bets-section {
-    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns for mid-sized screens */
-  }
-}
-
 @media (max-width: 768px) {
   .sub-tablinks {
     margin: 4px 2px; /* Adjust margins for tighter spaces */
     padding: 10px 5px; /* Adjust padding to fit smaller screens */
-  }
-}
-
-@media (min-width: 801px) and (max-width: 1100px) {
-  .bets-section {
-    grid-template-columns: repeat(3, 1fr); /* Increase to 3 columns for larger screens */
-  }
-}
-
-@media (min-width: 1101px) {
-  .bets-section {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns for the largest screens */
   }
 }
 
@@ -556,6 +572,5 @@ td {
         margin-left: auto;
         margin-right: auto;
         max-width: 375px; /* Ensures tables don't stretch beyond this width */
-        overflow-x: auto; /* Allows for horizontal scrolling on smaller screens */
     }
 }

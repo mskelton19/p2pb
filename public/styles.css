@@ -200,26 +200,7 @@
   }
 }
 
-#wagers-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* example for a responsive grid */
-  gap: 10px;
-  flex-direction: column;
-  align-items: center; /* Align items to the start horizontally */
-  justify-content: flex-start; /* Align items to the start vertically */
-  width: 100%;
-  padding: 5px;
-  box-sizing: border-box;
-}
 
-
-
-#wagers-list {
-  list-style: none; /* Remove default list styling */
-  padding: 0; /* Remove default padding */
-  margin: 0; /* Remove default margin */
-  width: 100%;
-}
 
 .wager-card .take-wager-button:disabled {
     background-color: gray;
