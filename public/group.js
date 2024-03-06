@@ -37,7 +37,6 @@ function openTab(tabName) {
 
   var tab = document.getElementById(tabName);
   if (tab) {
-    console.log("Showing tab content for:", tabName);
     tab.style.display = "block";
   } else {
     console.error("Tab content not found for ID:", tabName);
@@ -282,13 +281,11 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName
 async function fetchAndUpdateLiveScores() {
     try {
         await fetchAcceptedBets('in progress', currentUser, userGroup); // Fetch in-progress bets first
-        console.log('in progress bets 2', inProgressBetsGlobal)
         const response = await fetch('/live-scores');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const { liveScores } = await response.json();
-        console.log("Received live scores:", liveScores); // Log to inspect the structure
         updateScoresOnUI(liveScores);
     } catch (error) {
         console.error('Error fetching live scores:', error);
@@ -297,11 +294,12 @@ async function fetchAndUpdateLiveScores() {
 
 
 function updateScoresOnUI(liveScores) {
+  console.log(liveScores)
     // Assume inProgressBets is an array of bets currently displayed on the UI
     inProgressBetsGlobal.forEach(bet => {
-        if (liveScores[bet.eventId]) {
+        if (liveScores[bet._id]) {
             // We found live scores for this event
-            const { scores } = liveScores[bet.eventId];
+            const { scores } = liveScores[bet._id];
             // Update the UI for this bet with the live scores
             updateBetUI(bet, scores);
         }
@@ -613,7 +611,6 @@ function resetMyBetsDisplay() {
 }
 
 async function fetchAcceptedBets(status, currentUser, userGroup) {
-  console.log('status', status)
   try {
     const url = `/accepted-bets?status=${status}&currentUser=${currentUser}&userGroup=${userGroup}`;
     const response = await fetch(url);
@@ -696,6 +693,20 @@ function createBetCard(bet) {
   wagerAmount.textContent = `$${bet.wagerAmount}`;
   card.appendChild(wagerAmount);
 
+  // Original bet details, before formatting odds
+  const originalOddsFormatted = formatOdds(bet.originalOdds);
+  const acceptedOddsFormatted = formatOdds(bet.acceptedOdds);
+
+  // Initialize variables for outcome classes
+  let originalOutcomeClass = '';
+  let acceptedOutcomeClass = '';
+
+  // Determine and apply outcome class for original and accepted picks/odds only if there's a winner
+  if (bet.winner && bet.loser) {
+    originalOutcomeClass = bet.winner === bet.firstUser ? 'winner' : 'loser';
+    acceptedOutcomeClass = bet.winner === bet.betTaker ? 'winner' : 'loser';
+  }
+
   // Container for original and accepted details
   const detailsContainer = document.createElement('div');
   detailsContainer.classList.add('details-container');
@@ -704,14 +715,16 @@ function createBetCard(bet) {
   const originalDetails = document.createElement('div');
   originalDetails.classList.add('original-details');
   let originalScoresText = bet.liveScores ? `<div class="bet-scores">${bet.liveScores.originalPickScore}</div>` : '';
-  originalDetails.innerHTML = `${originalScoresText}<div>${bet.originalPick}<br>${bet.originalOdds}<br><br>${bet.firstUser}</div>`;
-  detailsContainer.appendChild(originalDetails);
+  originalDetails.innerHTML = `${originalScoresText}<div><span class="${originalOutcomeClass}">${bet.originalPick}</span><br><span class="${originalOutcomeClass}">${originalOddsFormatted}</span><br><br>${bet.firstUser}</div>`;
 
   // Accepted bet details
   const acceptedDetails = document.createElement('div');
   acceptedDetails.classList.add('accepted-details');
   let acceptedScoresText = bet.liveScores ? `<div class="bet-scores">${bet.liveScores.acceptedPickScore}</div>` : '';
-  acceptedDetails.innerHTML = `${acceptedScoresText}<div>${bet.acceptedPick}<br>${bet.acceptedOdds}<br><br>${bet.betTaker}</div>`;
+  acceptedDetails.innerHTML = `${acceptedScoresText}<div><span class="${acceptedOutcomeClass}">${bet.acceptedPick}</span><br><span class="${acceptedOutcomeClass}">${acceptedOddsFormatted}</span><br><br>${bet.betTaker}</div>`;
+
+  // Append original and accepted details to the container
+  detailsContainer.appendChild(originalDetails);
   detailsContainer.appendChild(acceptedDetails);
 
   // Append the details container to the card
@@ -737,6 +750,21 @@ async function fetchBet365Data(eventId) {
   }
 }
 
+function formatOdds(odds) {
+  if (typeof odds === 'string' && (odds.startsWith('+') || odds.startsWith('-'))) {
+    // Odds already have a prefix, return them as is
+    return odds;
+  } else {
+    // Convert to number to handle cases where odds might be passed as a string without +/-
+    const numericOdds = Number(odds);
+    if (numericOdds > 0) {
+      return `+${numericOdds}`; // Add '+' if positive
+    } else {
+      // If negative or zero, just return the odds as they will already have '-' or be zero
+      return `${numericOdds}`;
+    }
+  }
+}
 
 
 // ----------------------------wagers---------------------------

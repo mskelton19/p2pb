@@ -19,31 +19,24 @@
 }
 
 .team-card {
+  flex: 1;
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 5px;
   background-color: #fff;
+  text-align: center;
 }
 
 .odds-card {
+  flex: 1;
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 5px;
   background-color: #fff;
+  text-align: center;
 }
 
 .odds-card.selected {
   background-color: green;
   color: white;
-}
-
-.team-card, .odds-card {
-  flex: 1; /* Distribute space evenly among child elements */
-  text-align: center; /* Center text within the container */
-}
-
-.team-card div {
-  flex: 1; /* Each team takes equal space within the flex container */
 }
 
 /* Add this CSS to style the drawer */
@@ -260,16 +253,6 @@
   background-color: white;
 }
 
-.taken-team-card, .taken-odds-card {
-  color: #333; /* Neutral color */
-   font-size: 0.9em; /* Standard font size */
-   padding: 10px;
-   border-radius: 5px;
-   background-color: #f7f7f7; /* Light background */
-   margin: 5px 0; /* Adjust margins as needed */
-   text-align: center; /* Ensure text is centered *
-}
-
 .open-odds-card {
   cursor: pointer; /* Cursor changes to pointer to indicate clickability */
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -417,8 +400,6 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
-  font-size: 0.8em; /* Adjust font size */
-
 }
 
 .taken-team-card {
@@ -427,11 +408,6 @@ h1 {
   padding: 10px;
   width: 48%; /* Adjust as needed */
   text-align: center;
-}
-
-
-.team-card div {
-  margin-bottom: 5px;
 }
 
 .score {

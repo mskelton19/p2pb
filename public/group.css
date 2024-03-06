@@ -287,14 +287,23 @@ td {
   padding: 10px; /* Adjust padding to ensure text is centered, consider reducing if text appears offset */
   font-size: 16px; /* Adjust font size as needed for readability */
   margin: 0 auto; /* Center button horizontally within its container */
-    background-color: #dc3545; /* Bootstrap's danger color for reference */
-    color: white;
-    width: 50%;
+  background-color: #dc3545; /* Bootstrap's danger color for reference */
+  color: white;
+  width: 50%;
 }
 
 .button-take {
-    background-color: #28a745; /* Bootstrap's success color for reference */
-    color: white;
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  text-align: center; /* Ensure text itself is centered */
+  width: auto; /* Adjust width as needed, or set to 100% if you want the button to expand to container width */
+  padding: 10px; /* Adjust padding to ensure text is centered, consider reducing if text appears offset */
+  font-size: 16px; /* Adjust font size as needed for readability */
+  margin: 0 auto; /* Center button horizontally within its container */
+  background-color: #28a745; /* Bootstrap's success color for reference */
+  color: white;
+  width: 50%;
 }
 
 .button-delete:hover, .button-take:hover {
@@ -330,8 +339,8 @@ td {
 
 .details-container {
   display: flex; /* Continue using Flexbox */
-  gap: 20px; /* This creates space between flex items */
-  padding: 10px; /* Add padding around the edges to ensure the background extends around the children */
+  gap: 10px; /* This creates space between flex items */
+  padding: 5px; /* Add padding around the edges to ensure the background extends around the children */
   border-radius: 5px;
 }
 
@@ -347,7 +356,7 @@ td {
   box-sizing: border-box; /* Makes sure padding is included in the width/height calculations */
   background-color: white;
   border-radius: 5px;
-  max-width: 175px;
+  max-width: 180px;
   border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
 
@@ -437,6 +446,17 @@ td {
   margin: 0; /* Remove default margin */
   width: 100%;
 }
+
+.winner {
+  border: none;
+  color: green;
+}
+
+.loser {
+  border: none;
+  color: #dc3545;
+}
+
 
 /* ---------------Create Bet----------------- */
 .time {
