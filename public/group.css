@@ -313,27 +313,34 @@ td {
 /* ------------------My Bets------------------- */
 
 .bet-card {
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  width: 90%; /* Adjust based on your layout */
-  display: flex; /* Make the bet card a flex container */
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center-align items horizontally */
-  margin-bottom: 20px; /* Space between cards */
-  padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 5px; /* Space between cards */
   margin-left: auto;
   margin-right: auto;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   max-width: 375px;
   border: 1px solid #76877D; /* Added border: specify width, style, and color */
 }
 
+.event-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 5px;
+  margin-left: auto; /* Center the element horizontally */
+  margin-right: auto; /* Center the element horizontally */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+  max-width: 375px;
+  border: 1px solid #76877D; /* Added border: specify width, style, and color */
+}
+
+
 .game-time, .wager-amount {
-  margin-bottom: 10px; /* Add some space below these elements */
+  margin-bottom: 5px; /* Add some space below these elements */
   font-size: 16px;;
 }
 
@@ -351,7 +358,7 @@ td {
   text-align: center;
   margin: 5px 0; /* Adjusted to apply margin only to the top and bottom */
   flex: 1;
-  padding: 10px; /* Padding inside each details section */
+  padding: 5px; /* Padding inside each details section */
   min-width: 135px; /* Minimum width for each section */
   box-sizing: border-box; /* Makes sure padding is included in the width/height calculations */
   background-color: white;
@@ -362,7 +369,7 @@ td {
 
 /* Add a gap between the game time and the wager amount */
 .game-time + .wager-amount {
-  margin-top: 10px; /* Adjust according to your preference */
+  margin-top: 5px; /* Adjust according to your preference */
 }
 
 .bet-card, .game-time, .wager-amount, .original-details, .accepted-details {
@@ -378,8 +385,8 @@ td {
   color: black; /* White text for visibility */
   font-family: 'Courier New', Courier, monospace; /* Monospaced font for that digital look */
   font-size: 1.2em; /* Increase the font size */
-  padding: 12px 24px; /* Slightly larger padding for emphasis */
-  margin-bottom: 20px; /* Space below the scoreboard */
+  padding: 6px 12px; /* Slightly larger padding for emphasis */
+  margin-bottom: 8px; /* Space below the scoreboard */
   border-radius: 8px; /* Slightly larger rounded corners */
   box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Soft shadow for depth */
   width: auto; /* Auto width based on content size */
