@@ -792,16 +792,29 @@ function displayWagers(wagers) {
   const wagersContainer = document.getElementById('wagers-container');
   wagersContainer.innerHTML = ''; // Clear existing content
 
-  // Create and append wager cards for each wager
-  const now = new Date();
-  wagers.filter(wager => {
+  // Filter wagers based on the specified criteria
+  const filteredWagers = wagers.filter(wager => {
     const eventDateTime = new Date(wager.eventTime);
-    return eventDateTime > now && wager.group === userGroup;
-  }).forEach(wager => {
-    const wagerCard = createWagerCard(wager);
-    wagersContainer.appendChild(wagerCard);
+    return eventDateTime > new Date() && wager.group === userGroup;
   });
+
+  if (filteredWagers.length === 0) {
+    // No wagers meet the criteria, display a "No Open Bets" message
+    const noWagersMsg = document.createElement('div');
+    noWagersMsg.textContent = 'No Open Bets';
+    noWagersMsg.style.textAlign = 'center'; // Center the text
+    noWagersMsg.style.padding = '20px'; // Add some padding for aesthetics
+    noWagersMsg.style.fontSize = '18px'; // Increase font size for better readability
+    wagersContainer.appendChild(noWagersMsg);
+  } else {
+    // Create and append wager cards for each wager that meets the criteria
+    filteredWagers.forEach(wager => {
+      const wagerCard = createWagerCard(wager);
+      wagersContainer.appendChild(wagerCard);
+    });
+  }
 }
+
 
 function createWagerCard(wager) {
 

@@ -502,11 +502,17 @@ async function updateBetStatusesToFinished() {
               if (!scores) {
               scores = await processGameResults(results, bet); // Consider fetching scores here too if needed
               }
+
+              console.log('updatebetswithlivescores', scores);
+
               bet.originalScore = scores.originalPickScore;
               bet.acceptedScore = scores.acceptedPickScore;
 
               const originalTotalScore = parseFloat(scores.originalPickScore) + parseFloat(bet.originalOdds);
               const acceptedTotalScore = parseFloat(scores.acceptedPickScore);
+
+              console.log('original total score', originalTotalScore);
+              console.log('accepted total score', acceptedTotalScore);
 
               let winner, loser;
 
