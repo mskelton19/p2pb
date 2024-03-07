@@ -116,6 +116,7 @@ td {
   margin-left: auto; /* Center the element horizontally */
   margin-right: auto; /* Center the element horizontally */
   max-width: 375px;
+  font-size: 14px;
 }
 
 .sub-tablinks {
@@ -131,7 +132,7 @@ td {
 }
 
 .sub-tablinks:hover, .sub-tablinks.active {
-  background-color: #007bff; /* Highlight color for hover and active states */
+  background-color: #0056b3; /* Highlight color for hover and active states */
   color: #ffffff; /* White text for contrast */
   transform: translateY(-2px); /* Slight raise effect on hover */
 }
@@ -580,14 +581,15 @@ td {
   }
   .sub-tablinks {
     background-color: #ffffff; /* Light background making active tab stand out */
-    border: none;
+    border: 1px solid #ccc;
     padding: 5px 10px; /* Adequate padding for touch targets */
-    margin: 4px; /* Space between tabs */
+    margin: 8px; /* Space between tabs */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s; /* Smooth background color change and slight grow effect */
     border-radius: 4px; /* Rounded corners for tabs */
     font-weight: 600; /* Slightly bolder font for better readability */
-    font-size: 15px;
+    font-size: 12px;
+    width: 30%;
   }
   /* Additional responsive styles for smaller screens */
 }

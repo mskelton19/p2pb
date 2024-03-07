@@ -271,7 +271,6 @@ function createOddsCard(odds, eventCard, eventTime, sportId, eventId, leagueName
         const awayTeamName = eventCard.dataset.awayTeam;
 
         // Call a function to open the drawer
-        console.log('show drawer call')
         showDrawer(homeTeamName, awayTeamName, teamName, formattedOdds, eventTime, leagueName);
     });
 
@@ -294,7 +293,6 @@ async function fetchAndUpdateLiveScores() {
 
 
 function updateScoresOnUI(liveScores) {
-  console.log(liveScores)
     // Assume inProgressBets is an array of bets currently displayed on the UI
     inProgressBetsGlobal.forEach(bet => {
         if (liveScores[bet._id]) {

@@ -457,99 +457,106 @@ let liveScoresCache = {};
 
 async function updateBetStatusesToFinished() {
 
-  console.log(liveScoresCache)
-
   const inProgressBets = await fetchInProgressBets();
 
   for (const bet of inProgressBets) {
-    try {
-      const results = await fetchBet365Results(bet.eventId);
-      let scores = null;
-      // Check if the game is still in progress
-      if (results && !isEventFinished(results)) {
-        let scores = await processGameResults(results, bet); // Removed const for correct usage
+    console.log(bet)
+  }
 
-        console.log('scores before assignment logic', scores)
-        // console.log('bet return', bet)
+}
 
-        // Assign scores based on team names
-        if (bet.originalPick === scores.homeTeamName) {
-          scores.originalPickScore = scores.homeTeamScore;
-          scores.acceptedPickScore = scores.awayTeamScore;
-          scores.originalPick = bet.originalPick;
-          scores.acceptedPick = bet.acceptedPick;
-        } else {
-          scores.originalPickScore = scores.awayTeamScore;
-          scores.acceptedPickScore = scores.homeTeamScore;
-          scores.originalPick = bet.originalPick;
-          scores.acceptedPick = bet.acceptedPick;
-        }
-
-        console.log('scores after assignment logic', scores)
-
-        // Cache the detailed scores after correction
-        liveScoresCache[bet._id] = {
-          ...scores,
-          lastUpdated: new Date()
-        };
-
-        // console.log(liveScoresCache[bet._id])
-
-        // Update the bets with the corrected live scores
-        await updateBetsWithLiveScores(bet._id, scores);
-      } else if ( results && isEventFinished(results)) {
-              // game finished
-              if (!scores) {
-              scores = await processGameResults(results, bet); // Consider fetching scores here too if needed
-              }
-
-              console.log('updatebetswithlivescores', scores);
-
-              bet.originalScore = scores.originalPickScore;
-              bet.acceptedScore = scores.acceptedPickScore;
-
-              const originalTotalScore = parseFloat(scores.originalPickScore) + parseFloat(bet.originalOdds);
-              const acceptedTotalScore = parseFloat(scores.acceptedPickScore);
-
-              console.log('original total score', originalTotalScore);
-              console.log('accepted total score', acceptedTotalScore);
-
-              let winner, loser;
-
-              if (originalTotalScore > acceptedTotalScore) {
-                bet.winner = bet.firstUser;
-                bet.loser = bet.betTaker;
-                winner = bet.firstUser;
-                loser = bet.betTaker;
-              } else if (originalTotalScore < acceptedTotalScore) {
-                bet.winner = bet.betTaker;
-                bet.loser = bet.firstUser;
-                winner = bet.betTaker;
-                loser = bet.firstUser;
-              }
-
-              if (winner && loser) {
-                await updateWinLossStats(winner, loser);
-              }
-
-              bet.status = 'finished';
-              await moveBetToFinished(bet);
-            }
-
-            // console.log('scores +++++', scores)
-              } catch (err) {
-                  console.error('Error processing bet ID:', bet._id, err);
-              }
-          }
-
-          // If there are live scores to report back to the client
-       if (liveScoresData.length > 0) {
-           return liveScoresData; // Return live scores data for in-progress games
-       }
-
-       // Otherwise, you might return null or an empty array to indicate no live scores are available
-       return null;
-      }
+  // for (const bet of inProgressBets) {
+  //   try {
+  //     const results = await fetchBet365Results(bet.eventId);
+  //     console.log('results', results)
+  //     console.log(results.results[0].time_status)
+  //     const gameStatus = isEventFinished(results);
+  //     console.log(gameStatus)
+  //     let scores = null;
+  //     // Check if the game is still in progress
+  //     if (results && gameStatus === false) {
+  //       console.log('in scores function')
+  //       let scores = await processGameResults(results, bet); // Removed const for correct usage
+  //
+  //       // Assign scores based on team names
+  //       if (bet.originalPick === scores.homeTeamName) {
+  //         scores.originalPickScore = scores.homeTeamScore;
+  //         scores.acceptedPickScore = scores.awayTeamScore;
+  //         scores.originalPick = bet.originalPick;
+  //         scores.acceptedPick = bet.acceptedPick;
+  //       } else {
+  //         scores.originalPickScore = scores.awayTeamScore;
+  //         scores.acceptedPickScore = scores.homeTeamScore;
+  //         scores.originalPick = bet.originalPick;
+  //         scores.acceptedPick = bet.acceptedPick;
+  //       }
+  //       // Cache the detailed scores after correction
+  //       liveScoresCache[bet._id] = {
+  //         ...scores,
+  //         lastUpdated: new Date()
+  //       };
+  //
+  //       console.log(liveScoresCache[bet._id])
+  //
+  //       // Update the bets with the corrected live scores
+  //       await updateBetsWithLiveScores(bet._id, scores);
+  //     } else if ( results && (gameStatus === true)) {
+  //       console.log('in finish game function')
+  //       let scores = await processGameResults(results, bet); // Removed const for correct usage
+  //             // game finished
+  //             if (!scores) {
+  //             scores = await processGameResults(results, bet); // Consider fetching scores here too if needed
+  //             }
+  //
+  //             console.log('bets at top of finished logic', bet);
+  //
+  //             const originalTotalScore = parseFloat(bet.liveScores.originalPickScore) + parseFloat(bet.originalOdds);
+  //             const acceptedTotalScore = parseFloat(bet.liveScores.acceptedPickScore)
+  //
+  //             console.log('original', originalTotalScore);
+  //             console.log('accepted', acceptedTotalScore);
+  //
+  //             let winner, loser;
+  //
+  //             if (originalTotalScore > acceptedTotalScore) {
+  //               console.log('original winner logic')
+  //               bet.winner = bet.firstUser;
+  //               bet.loser = bet.betTaker;
+  //               winner = bet.firstUser;
+  //               loser = bet.betTaker;
+  //             } else if (originalTotalScore < acceptedTotalScore) {
+  //               console.log('accepted winner logic')
+  //               bet.winner = bet.betTaker;
+  //               bet.loser = bet.firstUser;
+  //               winner = bet.betTaker;
+  //               loser = bet.firstUser;
+  //             }
+  //
+  //             console.log('bets at bottom of bets', bet)
+  //
+  //             if (winner && loser) {
+  //               await updateWinLossStats(winner, loser);
+  //             }
+  //
+  //
+  //             bet.status = 'finished';
+  //             await moveBetToFinished(bet);
+  //           }
+  //
+  //           // console.log('scores +++++', scores)
+  //             } catch (err) {
+  //                 console.error('Error processing bet ID:', bet._id, err);
+  //             }
+  //         }
+  //
+  //         // If there are live scores to report back to the client
+  //      if (liveScoresData.length > 0) {
+  //          return liveScoresData; // Return live scores data for in-progress games
+  //      }
+  //
+  //      // Otherwise, you might return null or an empty array to indicate no live scores are available
+  //      return null;
+  //     }
 
 
 app.get('/live-scores', (req, res) => {
@@ -557,8 +564,6 @@ app.get('/live-scores', (req, res) => {
 });
 
 async function updateBetsWithLiveScores(betId, scores) {
-  console.log(betId);
-  console.log(scores);
     try {
         await acceptedBetsCollection.updateOne(
             { _id: betId }, // Use the unique _id to identify the bet
@@ -577,6 +582,7 @@ async function updateBetsWithLiveScores(betId, scores) {
 
 
 async function updateWinLossStats(winnerUsername, loserUsername) {
+  console.log('updating user win loss stats')
   // Increment wins for the winner
   await usersCollection.updateOne(
     { username: winnerUsername },
@@ -681,20 +687,22 @@ async function fetchBet365Results(eventId) {
 }
 
 function isEventFinished(results) {
+  // console.log('game status', results.results[0].time_status)
   return(results.results[0].time_status === '3')
 }
 
 async function moveBetToFinished(bet) {
+  console.log('move event to finished')
   const client = new MongoClient(mongoUri);
 
   try {
     await client.connect();
     const db = client.db('Bets');
-    // Correct the collection name to 'finishedBets' and fix the typo
     const finishedBetsCollection = db.collection('finishedBets');
     const insertResult = await finishedBetsCollection.insertOne(bet);
     console.log(`Bet ID ${bet._id} moved to 'finishedBets'. Insert Result:`, insertResult);
 
+    console.log('bet should have been moved by now')
     // If the insert was successful, remove the bet from 'acceptedBets'
     if (insertResult.acknowledged) {
       const acceptedBetsCollection = db.collection('acceptedBets');
