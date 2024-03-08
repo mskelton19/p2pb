@@ -364,10 +364,11 @@ const savedBets = [];
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
   let { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, status, leagueName } = req.body;
 
-  console.log('first game time', gameTime);
+  console.log('Received game time', gameTime);
 
-  gameTime = new Date(gameTime);
-  console.log(gameTime);
+  // Convert game time to UTC using moment.js for consistency
+   gameTime = moment(gameTime).utc().toDate();
+   console.log('Converted to UTC:', gameTime.toISOString());
 
   const betData = {
     originalPick,
