@@ -373,6 +373,7 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
   const otherTeamName = teamNames.homeTeamName === drawerTeamName ? teamNames.awayTeamName : teamNames.homeTeamName;
 
   const gameTime = eventTime;
+  console.log(gameTime)
 
   const sportId = selectedOddsCard.dataset.sportId;
   const eventId = selectedOddsCard.dataset.eventId;
