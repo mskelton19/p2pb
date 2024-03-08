@@ -367,9 +367,9 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 
   console.log('Received game time', gameTime);
 
-  gameTime = new Date(gameTime);
+  utcGameTime = new Date(gameTime);
 
-  console.log('utc gametime', gameTime)
+  console.log('utc gametime', utcGameTime)
 
   const betData = {
     originalPick,
@@ -377,7 +377,7 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     originalOdds,
     acceptedOdds,
     wagerAmount,
-    gameTime,
+    utcGameTime,
     firstUser,
     betTaker,
     sportId,
