@@ -367,9 +367,10 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 
   console.log('Received game time', gameTime);
 
-  utcGameTime = new Date(gameTime);
+  gameTime = new Date(gameTime);
+  gameTime = toUTC(gameTime);
 
-  console.log('utc gametime', utcGameTime)
+  console.log('utc gametime', gameTime)
 
   const betData = {
     originalPick,
@@ -377,7 +378,7 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     originalOdds,
     acceptedOdds,
     wagerAmount,
-    utcGameTime,
+    gameTime,
     firstUser,
     betTaker,
     sportId,
@@ -404,6 +405,12 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
   res.status(500).send('Error saving bet: ' + error.message);
 }
 });
+
+// Convert local time to UTC before sending to server
+function toUTC(gameTime) {
+  console.log('hello', gameTime)
+  return DateTime.fromISO(gameTime, { zone: 'local' }).toUTC().toISO();
+}
 
 app.get('/accepted-bets', async (req, res) => {
   if (!req.isAuthenticated()) {
