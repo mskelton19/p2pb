@@ -14,8 +14,7 @@ const mongoUri = process.env.MONGO_URI;
 const { MongoClient, ObjectId } = require('mongodb');
 const mongoClient = new MongoClient(mongoUri);
 const cron = require('node-cron');
-const moment = require('moment-timezone');
-
+const { DateTime } = require('luxon');
 
 
 // Database connection
@@ -368,9 +367,9 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 
   console.log('Received game time', gameTime);
 
-  // Convert game time to UTC using moment.js for consistency
-   gameTime = moment(gameTime).utc().toDate();
-   console.log('Converted to UTC:', gameTime.toISOString());
+  gameTime = new Date(gameTime);
+
+  console.log('utc gametime', gameTime)
 
   const betData = {
     originalPick,
