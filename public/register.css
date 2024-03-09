@@ -55,6 +55,7 @@ input[type="submit"]:hover {
 .login-form {
   width: 100%;
   max-width: 350px;
+  /* height: 75%; */
 }
 
 .register-link {
@@ -125,7 +126,7 @@ input[type="submit"]:hover {
 }
 
 .modal button {
-  width: 100%;
+  width: 95%;
   padding: 15px;
   border: none;
   background-color: #007bff;
@@ -144,7 +145,7 @@ input[type="submit"]:hover {
 @media (max-width: 450px) {
     .modal-content {
         width: 90%; /* Full width on devices less than 768px wide */
-        height: 35%; /* Optional: You may want the modal to cover the full height on mobile */
+        height: 45%; /* Optional: You may want the modal to cover the full height on mobile */
         border-radius: 5px; /* Optional: Makes the modal content fully cover the screen corner edges on mobile */
         max-height: 90vh;
         transform: translateY(-70%);
