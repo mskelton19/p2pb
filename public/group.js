@@ -142,6 +142,8 @@ async function fetchEventsForCreateBet(sportId, leagueId) {
 
 function displayEventData(event, oddsData) {
 
+  console.log('event', event)
+
   const eventsContainer = document.getElementById('createBet-events-container');
   eventsContainer.classList.add('events-container');
 
@@ -326,15 +328,17 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime, leagueNam
 
   // Parse eventTime as a Date object
   const parsedEventTime = new Date(parseInt(eventTime));
+  const timestamp = eventTime;
+
+  console.log('show drawer', timestamp)
 
   const teamNames = { homeTeamName, awayTeamName };
-  // console.log(getUserTimeZoneDateTime(parsedEventTime))
 
   // Pass team names to the confirmWager function
   const confirmButton = document.getElementById('confirmButton');
   confirmButton.onclick = function () {
     // confirmWager(teamNames, getUserTimeZoneDateTime(parsedEventTime), username);
-    confirmWager2(teamNames, getUserTimeZoneDateTime(parsedEventTime), currentUser, leagueName);
+    confirmWager2(teamNames, getUserTimeZoneDateTime(parsedEventTime), currentUser, leagueName, timestamp);
   };
 
   drawer.style.height = 'auto';
@@ -361,7 +365,9 @@ function hideDrawer() {
 }
 
 // Add this function to handle confirming the wager
-function confirmWager2(teamNames, eventTime, username, leagueName, group) {
+function confirmWager2(teamNames, eventTime, username, leagueName, timestamp) {
+
+  console.log('confirm', timestamp)
 
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;
@@ -373,7 +379,6 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
   const otherTeamName = teamNames.homeTeamName === drawerTeamName ? teamNames.awayTeamName : teamNames.homeTeamName;
 
   const gameTime = eventTime;
-  console.log(gameTime)
 
   const sportId = selectedOddsCard.dataset.sportId;
   const eventId = selectedOddsCard.dataset.eventId;
@@ -397,6 +402,7 @@ function confirmWager2(teamNames, eventTime, username, leagueName, group) {
         sportId: sportId,
         bet365Id: eventId,
         leagueName: leagueName,
+        timestamp: timestamp,
       }),
     })
       .then(response => response.json())
@@ -976,7 +982,8 @@ function handleTakeWager2(wager, currentUser, userGroup ) {
       userGroup: userGroup,
       leagueName: wager.leagueName,
       status: "upcoming",
-      _id: wager._id
+      _id: wager._id,
+      utcTimestamp: wager.utcTimestamp,
     }),
   })
   .then(response => response.json())

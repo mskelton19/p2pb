@@ -277,9 +277,11 @@ const wagers = [];
 
 // Placing a wager
 app.post('/place-wager', express.json(), async (req, res) => {
-  const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName } = req.body;
+  const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName, timestamp } = req.body;
 
-  console.log(eventTime);
+  console.log(timestamp);
+  utcTimestamp = parseInt(timestamp);
+  console.log(utcTimestamp);
 
   const wagerId = uuidv4();
 
@@ -296,6 +298,7 @@ app.post('/place-wager', express.json(), async (req, res) => {
     bet365Id,
     _id: wagerId,
     leagueName,
+    utcTimestamp,
   };
 
   try {
@@ -363,14 +366,10 @@ app.post('/remove-wager', express.json(), async (req, res) => {
 const savedBets = [];
 
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
-  let { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, _id, status, leagueName } = req.body;
+  let { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, leagueName, status, _id, utcTimestamp } = req.body;
 
-  console.log('Received game time', gameTime);
-
-  gameTime = new Date(gameTime);
-  gameTime = toUTC(gameTime);
-
-  console.log('utc gametime', gameTime)
+  console.log('Received timestamp', utcTimestamp);
+  console.log('game time', gameTime);
 
   const betData = {
     originalPick,
@@ -387,6 +386,7 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
     status,
     leagueName,
     _id,
+    utcTimestamp,
     // Include other relevant fields
   };
 
@@ -447,12 +447,13 @@ async function updateBetStatuses() {
     const db = client.db("Bets");
     const collection = db.collection("acceptedBets");
 
-    // Current time in the appropriate format
-    const now = new Date();
-    console.log('now', now)
-    // Update the status of bets where the game time has passed
+    // Get the current UTC time in seconds since the Unix Epoch
+    const now = Math.floor(Date.now() / 1000);
+    console.log('now (UTC timestamp in seconds):', now);
+
+    // Update the status of bets where the utcTimestamp has passed
     const result = await collection.updateMany(
-      { gameTime: { $lt: now }, status: "upcoming" },
+      { utcTimestamp: { $lt: now }, status: "upcoming" },
       { $set: { status: "in progress" } }
     );
 
