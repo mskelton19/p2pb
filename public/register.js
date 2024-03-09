@@ -114,11 +114,12 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                window.location.href = '/login';
-            } else {
-                alert(data.message || 'Registration failed. Please try again.');
-            }
+          if (data.success) {
+          // Use the provided redirect URL from the server response
+            window.location.href = data.redirectUrl;
+          } else {
+            alert(data.message || 'Registration failed. Please try again.');
+          }
         })
         .catch(error => {
             console.error('Registration error:', error);

@@ -111,7 +111,6 @@ app.post('/register', async (req, res) => {
         }
 
         const hash = await bcryptjs.hash(password, 10);
-        // Create the user document including the groupName, and initializing wins and losses to 0
         const newUser = {
             username,
             password: hash,
@@ -119,11 +118,24 @@ app.post('/register', async (req, res) => {
             wins: 0, // Initialize wins to 0
             losses: 0 // Initialize losses to 0
         };
-        await usersCollection.insertOne(newUser);
 
-        req.session.groupPasswordHash = null;
+        // Insert the new user into your database
+        const insertedUser = await usersCollection.insertOne(newUser);
+        console.log(insertedUser);
 
-        return res.json({ success: true, redirectUrl: '/login?registration=success' });
+        // Fetch the inserted user to log in
+        const userToLogin = await usersCollection.findOne({ _id: insertedUser.insertedId });
+        console.log(userToLogin);
+
+        // Programmatically log in the user
+        req.login(userToLogin, async (err) => {
+            if (err) {
+                console.error('Login error:', err);
+                return res.status(500).json({ success: false, message: 'Login failed after registration.' });
+            }
+            // Redirect or render the group page
+            return res.json({ success: true, redirectUrl: '/mygroup' }); // This tells the client-side where to redirect upon success.
+        });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ success: false, message: 'Server error during registration.' });
