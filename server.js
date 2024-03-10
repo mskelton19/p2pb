@@ -97,7 +97,10 @@ app.get('/signout', (req, res) => {
 
 // Register functionality
 app.post('/register', async (req, res) => {
-    const { username, password, group, groupPassword } = req.body;
+    let { username, password, group, groupPassword } = req.body;
+
+    username = username.toLowerCase();
+    console.log(username);
 
     try {
         const groupDoc = await groupsCollection.findOne({ group: group });
