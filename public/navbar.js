@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuCheckbox = document.getElementById('menu-toggle');
 
   menuIcon.addEventListener('click', () => {
+    console.log('navbar')
     // Toggle the checkbox state
     menuCheckbox.checked = !menuCheckbox.checked;
   });

@@ -78,7 +78,7 @@ function openTab(tabName) {
 
   if (tabName === 'createBet') {
         setupCreateBetTab(); // Initialize or refresh the content for "Create Bet"
-        fetchEventsForCreateBet(18, 10042997); // Example: Fetch NFL events as the tab is opened
+        fetchEventsForCreateBet(12, 10040630); // Example: Fetch NFL events as the tab is opened
   }
 }
 
@@ -95,17 +95,36 @@ function setupFloatingActionButtonListener() {
 
 function setupCreateBetTab() {
     const createBetSportIcons = document.querySelectorAll('#createBet-sports-icons-container .createBet-sport-icon');
+
+    // Highlight NCAAB by default and fetch its events
+    const defaultNCAABIcon = document.querySelector('.createBet-sport-icon[data-sportid="12"][data-leagueid="10040630"]');
+    if (defaultNCAABIcon) {
+        defaultNCAABIcon.classList.add('highlighted-icon');
+        const defaultSportId = defaultNCAABIcon.dataset.sportid;
+        const defaultLeagueId = defaultNCAABIcon.dataset.leagueid;
+        fetchEventsForCreateBet(defaultSportId, defaultLeagueId);
+    }
+
     createBetSportIcons.forEach(icon => {
-        icon.addEventListener('click', function() {
-          if (isFetching) {
-                console.log("Fetch in progress. Please wait.");
-                return; // Exit if a fetch is already in progress
+        icon.addEventListener('click', async function() {
+            if (isFetching) {
+                alert("Please wait for the current operation to complete before selecting another sport.");
+                return; // Exit to prevent highlighting and fetching
             }
-            createBetSportIcons.forEach(icon => icon.classList.remove('highlighted-icon'));
-            this.classList.add('highlighted-icon');
+
+            // No need to set isFetching here
             const sportId = this.dataset.sportid;
             const leagueId = this.dataset.leagueid;
-            fetchEventsForCreateBet(sportId, leagueId);
+
+            try {
+                await fetchEventsForCreateBet(sportId, leagueId);
+                // If successful, adjust highlights
+                createBetSportIcons.forEach(icon => icon.classList.remove('highlighted-icon')); // Remove highlight from all
+                this.classList.add('highlighted-icon'); // Highlight the clicked icon
+            } catch (error) {
+                console.error("Failed to fetch events:", error);
+                alert("Failed to load events. Please try again.");
+            }
         });
     });
 }
@@ -136,13 +155,11 @@ async function fetchEventsForCreateBet(sportId, leagueId) {
     } catch (error) {
         console.error('Error fetching data:', error.message);
     } finally {
-      isFetching = false;
+        isFetching = false; // Ensure isFetching is reset to false
     }
 }
 
 function displayEventData(event, oddsData) {
-
-  console.log('event', event)
 
   const eventsContainer = document.getElementById('createBet-events-container');
   eventsContainer.classList.add('events-container');
@@ -330,8 +347,6 @@ function showDrawer(homeTeamName, awayTeamName, pick, odds, eventTime, leagueNam
   const parsedEventTime = new Date(parseInt(eventTime));
   const timestamp = eventTime;
 
-  console.log('show drawer', timestamp)
-
   const teamNames = { homeTeamName, awayTeamName };
 
   // Pass team names to the confirmWager function
@@ -366,8 +381,6 @@ function hideDrawer() {
 
 // Add this function to handle confirming the wager
 function confirmWager2(teamNames, eventTime, username, leagueName, timestamp) {
-
-  console.log('confirm', timestamp)
 
   // Pass along original pick
   const drawerTeamName = document.getElementById('drawerTeamName').textContent;

@@ -294,9 +294,7 @@ const wagers = [];
 app.post('/place-wager', express.json(), async (req, res) => {
   const { teamName, openTeam, takenOdds, openOdds, wager, eventTime, firstUser, group, sportId, bet365Id, leagueName, timestamp } = req.body;
 
-  console.log(timestamp);
   utcTimestamp = parseInt(timestamp);
-  console.log(utcTimestamp);
 
   const wagerId = uuidv4();
 
@@ -382,9 +380,9 @@ const savedBets = [];
 
 app.post('/accepted-bet-2', express.json(), async (req, res) => {
   let { originalPick, acceptedPick, originalOdds, acceptedOdds, wagerAmount, gameTime, firstUser, betTaker, sportId, eventId, userGroup, leagueName, status, _id, utcTimestamp } = req.body;
-
-  console.log('Received timestamp', utcTimestamp);
-  console.log('game time', gameTime);
+  //
+  // console.log('Received timestamp', utcTimestamp);
+  // console.log('game time', gameTime);
 
   const betData = {
     originalPick,
@@ -423,7 +421,6 @@ app.post('/accepted-bet-2', express.json(), async (req, res) => {
 
 // Convert local time to UTC before sending to server
 function toUTC(gameTime) {
-  console.log('hello', gameTime)
   return DateTime.fromISO(gameTime, { zone: 'local' }).toUTC().toISO();
 }
 
