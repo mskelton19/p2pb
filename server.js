@@ -103,6 +103,13 @@ app.post('/register', async (req, res) => {
     console.log(username);
 
     try {
+
+        // check is user name already exists
+        const existingUser = await usersCollection.findOne({ username: username });
+         if (existingUser) {
+             return res.status(400).json({ success: false, message: 'Username is already taken. Please choose another one.' });
+         }
+         
         const groupDoc = await groupsCollection.findOne({ group: group });
         if (!groupDoc) {
             return res.status(400).json({ success: false, message: 'Group not found.' });
